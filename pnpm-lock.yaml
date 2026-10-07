@@ -228,8 +228,8 @@ importers:
         specifier: 3.6.2
         version: 3.6.2
       qwik-image:
-        specifier: ^2.0.4
-        version: 2.0.4(@qwik.dev/core@2.0.0-rc.0(@oxc-project/types@0.152.0)(esbuild@0.27.7)(prettier@3.6.2)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))(vitest@5.0.3(@types/node@20.19.0)(happy-dom@20.14.5)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))))
+        specifier: ^1.0.0
+        version: 1.0.0(@builder.io/qwik@1.20.1(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)))
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -4371,10 +4371,10 @@ packages:
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
 
-  qwik-image@2.0.4:
-    resolution: {integrity: sha512-+DCqQOqT5F+135C0tPSjwhvSemeyi7Sh8+1E6Ymk4rjss22dKQp9IFjsKXM30OK7hr06XZv9uaKt71PeJj/gCw==}
+  qwik-image@1.0.0:
+    resolution: {integrity: sha512-H4jIQFAQL0C8fR+RoelKGnHkw09k65p+vJZMXLiH+UGcEsib/ubA7MZiwpxlWJFe7Px/2FwTOKN6gKVza+a4bQ==}
     peerDependencies:
-      '@qwik.dev/core': ^2.0.0-beta.38
+      '@builder.io/qwik': ^1.14.1 || ^2.0.0
 
   rc9@3.1.0:
     resolution: {integrity: sha512-ufjkNVzbRHKcCOmTahZkmVsyc3W+MSk3jY03m+a7tGHkIsdVMG9l10/3HvFbWkkKzY5VFp3pkRsIo/UYgmFL7Q==}
@@ -6696,36 +6696,6 @@ snapshots:
       '@parcel/watcher-win32-arm64': 2.6.0
       '@parcel/watcher-win32-x64': 2.6.0
     optional: true
-
-  '@qwik.dev/core@2.0.0-rc.0(@oxc-project/types@0.152.0)(esbuild@0.27.7)(prettier@3.6.2)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))(vitest@5.0.3(@types/node@20.19.0)(happy-dom@20.14.5)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)))':
-    dependencies:
-      '@emnapi/core': 1.11.3
-      '@emnapi/runtime': 1.11.3
-      '@qwik.dev/optimizer': 2.1.0-beta.9
-      csstype: 3.2.3
-      launch-editor: 2.14.2
-      magic-regexp: 0.11.2(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))
-      magic-string: 0.30.21
-      oxc-parser: 0.144.0
-      oxc-transform: 0.144.0
-      oxc-walker: 1.1.1(@oxc-project/types@0.152.0)(oxc-parser@0.144.0)(rolldown@1.2.12)
-      pathe: 2.0.3
-      siphash: 1.2.0
-      vite: 7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)
-    optionalDependencies:
-      prettier: 3.6.2
-      vitest: 5.0.3(@types/node@20.19.0)(happy-dom@20.14.5)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@oxc-project/types'
-      - '@rsbuild/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - webpack
 
   '@qwik.dev/core@2.0.0-rc.0(@oxc-project/types@0.152.0)(esbuild@0.27.7)(prettier@3.9.9)(rolldown@1.2.12)(rollup@4.64.0)(vite@8.3.3(@types/node@26.6.3)(esbuild@0.27.7)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))':
     dependencies:
@@ -9262,24 +9232,6 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  magic-regexp@0.11.2(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)):
-    dependencies:
-      magic-string: 1.4.3
-      regexp-tree: 0.1.27
-      type-level-regexp: 0.1.17
-      unplugin: 3.4.0(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@rsbuild/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - vite
-      - webpack
-
   magic-regexp@0.11.2(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@8.3.3(@types/node@26.6.3)(esbuild@0.27.7)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
       magic-string: 1.4.3
@@ -10063,9 +10015,9 @@ snapshots:
 
   quick-format-unescaped@4.0.4: {}
 
-  qwik-image@2.0.4(@qwik.dev/core@2.0.0-rc.0(@oxc-project/types@0.152.0)(esbuild@0.27.7)(prettier@3.6.2)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))(vitest@5.0.3(@types/node@20.19.0)(happy-dom@20.14.5)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)))):
+  qwik-image@1.0.0(@builder.io/qwik@1.20.1(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))):
     dependencies:
-      '@qwik.dev/core': 2.0.0-rc.0(@oxc-project/types@0.152.0)(esbuild@0.27.7)(prettier@3.6.2)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))(vitest@5.0.3(@types/node@20.19.0)(happy-dom@20.14.5)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)))
+      '@builder.io/qwik': 1.20.1(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1))
 
   rc9@3.1.0:
     dependencies:
@@ -10804,17 +10756,6 @@ snapshots:
       unist-util-visit-parents: 6.0.2
 
   universalify@2.0.1: {}
-
-  unplugin@3.4.0(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      picomatch: 4.0.7
-      webpack-virtual-modules: 0.6.2
-    optionalDependencies:
-      esbuild: 0.27.7
-      rolldown: 1.2.12
-      rollup: 4.64.0
-      vite: 7.3.1(@types/node@20.19.0)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(lightningcss@1.33.0)(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)
 
   unplugin@3.4.0(esbuild@0.27.7)(rolldown@1.2.12)(rollup@4.64.0)(vite@8.3.3(@types/node@26.6.3)(esbuild@0.27.7)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass@1.105.1)(stylus@0.62.0(supports-color@7.2.0))(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
