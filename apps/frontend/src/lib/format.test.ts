@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { formatDay, formatRate, formatTime } from './format';
+import {
+  formatAmount,
+  formatDay,
+  formatDuration,
+  formatHours,
+  formatRate,
+  formatShortDay,
+  formatTime,
+} from './format';
 
 const spaces = (value: string) => value.replace(/\s+/g, ' ');
 
@@ -31,5 +39,41 @@ describe('formatDay', () => {
 
   it.each(['nope', '2026-13-45', ''])('returns invalid day %s unchanged', (input) => {
     expect(formatDay(input)).toBe(input);
+  });
+});
+
+describe('formatAmount', () => {
+  it('formats cents like the mockup summary', () => {
+    expect(spaces(formatAmount(135))).toBe('135,00 €');
+    expect(spaces(formatAmount(68.25))).toBe('68,25 €');
+  });
+});
+
+describe('formatShortDay', () => {
+  it('formats a short calendar day', () => {
+    expect(formatShortDay('2026-11-16')).toBe('lun. 16 nov. 2026');
+  });
+
+  it('returns an invalid day unchanged', () => {
+    expect(formatShortDay('nope')).toBe('nope');
+  });
+});
+
+describe('formatHours', () => {
+  it.each([
+    [60, '1 heure'],
+    [180, '3 heures'],
+    [90, '1,5 heure'],
+  ])('formats %i minutes as %s', (minutes, label) => {
+    expect(formatHours(minutes)).toBe(label);
+  });
+});
+
+describe('formatDuration', () => {
+  it.each([
+    [120, '2 h'],
+    [90, '1,5 h'],
+  ])('formats %i minutes as %s', (minutes, label) => {
+    expect(formatDuration(minutes)).toBe(label);
   });
 });

@@ -1,13 +1,8 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useSignal, useTask$ } from '@builder.io/qwik';
 import { routeLoader$, type DocumentHead } from '@builder.io/qwik-city';
 import { getRoomsByRoomId, getRoomsByRoomIdAvailability } from '@room-booking/core';
-import {
-  DayNav,
-  SLOT_GRID,
-  SlotLabel,
-  SlotsHeading,
-  slotClass,
-} from '~/components/booking/slot-grid';
+import { BookingSummary } from '~/components/booking/booking-summary';
+import { DayNav, SlotPicker } from '~/components/booking/slot-picker';
 import { RoomPhoto } from '~/components/room-card/room-card';
 import { Alert } from '~/components/ui/alert';
 import { ButtonLink } from '~/components/ui/button';
@@ -17,6 +12,7 @@ import { BackLink, EmptyState, Meta, MetaItem } from '~/components/ui/page-heade
 import { api } from '~/lib/api/client.server';
 import { parisToday } from '~/lib/dates';
 import { formatRate } from '~/lib/format';
+import type { SlotRange } from '~/lib/slots';
 import { isoDate } from '~/lib/url-params';
 
 export const useRoom = routeLoader$(async (event) => {
@@ -45,6 +41,11 @@ export const useAvailability = routeLoader$(async (event) => {
 export default component$(() => {
   const room = useRoom();
   const availability = useAvailability();
+  const selection = useSignal<SlotRange | null>(null);
+  useTask$(({ track }) => {
+    track(() => availability.value.day);
+    selection.value = null;
+  });
   const value = room.value;
   if (!value) {
     return (
@@ -89,20 +90,7 @@ export default component$(() => {
               <h2 id="slots-title">Choisir un créneau</h2>
               <DayNav day={day} min={today} />
               {slots ? (
-                <div class="flex flex-col gap-(--space-2)">
-                  <SlotsHeading id="slots-label" day={day} />
-                  <ul aria-labelledby="slots-label" class={SLOT_GRID}>
-                    {slots.map((slot) => (
-                      <li
-                        key={slot.startTime}
-                        aria-disabled={slot.available ? undefined : 'true'}
-                        class={slotClass}
-                      >
-                        <SlotLabel slot={slot} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <SlotPicker day={day} slots={slots} selection={selection} />
               ) : (
                 <Alert tone="danger" title="Les créneaux n'ont pas pu être chargés">
                   <p>Le serveur ne répond pas. Choisissez une autre date ou réessayez.</p>
@@ -111,6 +99,20 @@ export default component$(() => {
             </div>
           </section>
         </div>
+        <aside
+          aria-labelledby="booking-title"
+          class={[CARD, 'lg:sticky lg:top-[calc(4rem+var(--space-4))]']}
+        >
+          <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
+            <h2 id="booking-title">Votre réservation</h2>
+            <BookingSummary
+              day={day}
+              slots={slots ?? []}
+              selection={selection}
+              pricePerHour={value.pricePerHour}
+            />
+          </div>
+        </aside>
       </div>
     </>
   );
