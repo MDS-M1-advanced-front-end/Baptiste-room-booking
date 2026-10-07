@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "qwik": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/home/baptisteledev/Documents/Git/Projects/Room-booking/frontend/node_modules/@qwik.dev/mcp/dist/cli.js",
+        "/home/baptisteledev/Documents/Git/Projects/Room-booking/frontend"
+      ]
+    }
+  }
+}

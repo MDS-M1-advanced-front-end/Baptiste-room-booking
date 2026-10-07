@@ -25,6 +25,7 @@
     "prettier": "3.9.9",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1",
-    "yaml": "2.9.1"
+    "yaml": "2.9.1",
+    "@qwik.dev/mcp": "2.0.0-rc.0"
   }
 }
