@@ -147,7 +147,7 @@ export default component$(() => {
       <BackLink href="/rooms/" label="Retour aux résultats" />
       <div class={ASIDE_LAYOUT}>
         <div class="flex flex-col gap-(--space-6)">
-          <RoomPhoto room={value} hero />
+          <RoomPhoto room={value} variant="hero" />
           <div class="flex flex-col gap-(--space-2)">
             <h1>{value.name}</h1>
             <Meta>

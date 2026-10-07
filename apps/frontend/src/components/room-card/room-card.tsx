@@ -9,35 +9,45 @@ import { Icon } from '~/components/ui/icon';
 import { Meta, MetaItem } from '~/components/ui/page-header';
 import { formatRate } from '~/lib/format';
 
-export const RoomPhoto = component$<{ room: Room; hero?: boolean }>(({ room, hero }) => {
-  const frame = [
-    'aspect-video w-full',
-    hero && 'rounded-(--radius-lg) lg:aspect-[21/9]',
-    room.status === 'INACTIVE' && 'grayscale',
-  ];
-  return room.imageUrl ? (
-    <Image
-      src={room.imageUrl}
-      alt=""
-      layout="fullWidth"
-      objectFit="cover"
-      placeholder="var(--color-action-subtle)"
-      loading={hero ? 'eager' : 'lazy'}
-      fetchpriority={hero ? 'high' : undefined}
-      class={['block', frame]}
-    />
-  ) : (
-    <div
-      aria-hidden="true"
-      class={['grid place-items-center bg-(--color-action-subtle) text-(--color-action)', frame]}
-    >
-      <Icon
-        name="building"
-        class="size-10 rounded-(--radius-full) bg-(--color-surface) p-(--space-2) stroke-[1.5]"
+const PHOTO_FRAMES = {
+  card: 'aspect-video w-full',
+  hero: 'aspect-video w-full rounded-(--radius-lg) lg:aspect-[21/9]',
+  thumb: 'h-9 w-12 flex-none rounded-(--radius-sm)',
+};
+
+export const RoomPhoto = component$<{ room: Room; variant?: keyof typeof PHOTO_FRAMES }>(
+  ({ room, variant = 'card' }) => {
+    const frame = [PHOTO_FRAMES[variant], room.status === 'INACTIVE' && 'grayscale'];
+    const hero = variant === 'hero';
+    return room.imageUrl ? (
+      <Image
+        src={room.imageUrl}
+        alt=""
+        layout={variant === 'thumb' ? 'fixed' : 'fullWidth'}
+        width={variant === 'thumb' ? 48 : undefined}
+        height={variant === 'thumb' ? 36 : undefined}
+        objectFit="cover"
+        placeholder="var(--color-action-subtle)"
+        loading={hero ? 'eager' : 'lazy'}
+        fetchpriority={hero ? 'high' : undefined}
+        class={['block', frame]}
       />
-    </div>
-  );
-});
+    ) : (
+      <div
+        aria-hidden="true"
+        class={['grid place-items-center bg-(--color-action-subtle) text-(--color-action)', frame]}
+      >
+        <Icon
+          name="building"
+          class={[
+            'rounded-(--radius-full) bg-(--color-surface) stroke-[1.5]',
+            variant === 'thumb' ? 'size-6 p-(--space-1)' : 'size-10 p-(--space-2)',
+          ]}
+        />
+      </div>
+    );
+  },
+);
 
 export const RoomCard = component$<{ room: Room }>(({ room }) => (
   <article
