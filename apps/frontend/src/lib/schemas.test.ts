@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from '@builder.io/qwik-city';
-import { loginShape, profileShape, registerShape } from './schemas';
+import { loginShape, profileShape, registerShape, reservationSchema } from './schemas';
 
 const login = z.object(loginShape);
 const register = z.object(registerShape);
@@ -61,5 +61,40 @@ describe('profileShape', () => {
     expect(firstIssue(profile.safeParse({ firstName: 'Léa', lastName: 'Martin' }))?.path).toEqual([
       'email',
     ]);
+  });
+});
+
+describe('reservationSchema', () => {
+  const valid = {
+    date: '2026-11-16',
+    startTime: '15:00',
+    endTime: '18:00',
+    numberOfParticipants: '8',
+    comment: 'Atelier',
+  };
+
+  it('accepts a booking request and coerces participants', () => {
+    expect(reservationSchema.safeParse(valid)).toMatchObject({
+      success: true,
+      data: { numberOfParticipants: 8 },
+    });
+  });
+
+  it('accepts an empty comment', () => {
+    expect(reservationSchema.safeParse({ ...valid, comment: '' }).success).toBe(true);
+  });
+
+  it.each([
+    [{ numberOfParticipants: '0' }, 'numberOfParticipants'],
+    [{ numberOfParticipants: 'abc' }, 'numberOfParticipants'],
+    [{ numberOfParticipants: '2.5' }, 'numberOfParticipants'],
+    [{ comment: 'x'.repeat(501) }, 'comment'],
+    [{ date: '2026-13-45' }, 'date'],
+    [{ startTime: '' }, 'startTime'],
+    [{ endTime: '25:00' }, 'endTime'],
+    [{ endTime: '15:00' }, 'endTime'],
+    [{ endTime: '14:00' }, 'endTime'],
+  ])('rejects %o on %s', (patch, path) => {
+    expect(firstIssue(reservationSchema.safeParse({ ...valid, ...patch }))?.path).toEqual([path]);
   });
 });
