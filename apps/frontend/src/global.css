@@ -1,9 +1,57 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-family-base);
-  line-height: var(--line-height-base);
+@layer base {
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-base);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
+  }
+
+  h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  h3 {
+    font-size: var(--font-size-md);
+  }
+
+  @media (min-width: 64rem) {
+    h1 {
+      font-size: var(--font-size-2xl);
+    }
+  }
+
+  a {
+    color: var(--color-action);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  a:hover {
+    color: var(--color-action-hover);
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  code {
+    font-family: var(--font-family-mono);
+  }
 }
