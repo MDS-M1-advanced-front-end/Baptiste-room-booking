@@ -56,3 +56,29 @@ export const reservationSchema = z
       .optional(),
   })
   .refine((value) => value.endTime > value.startTime, { path: ['endTime'], message: SLOT_MESSAGE });
+
+const amount = (message: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, message)
+    .pipe(z.coerce.number({ invalid_type_error: message }));
+
+export const roomShape = {
+  name: required('Saisissez le nom de la salle.'),
+  description: z.string().trim().optional(),
+  location: required('Saisissez le lieu de la salle.'),
+  capacity: amount('Saisissez une capacité.')
+    .pipe(z.number().int('La capacité doit être un nombre entier.'))
+    .pipe(z.number().min(1, "La capacité doit être d'au moins 1 personne.")),
+  pricePerHour: amount('Saisissez un tarif horaire.').pipe(
+    z.number().min(0, 'Le tarif horaire ne peut pas être négatif.'),
+  ),
+  equipment: z.array(z.string()).default([]),
+  imageUrl: z
+    .string()
+    .trim()
+    .url('Saisissez une adresse complète, par exemple https://exemple.fr/photo.jpg')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
+};

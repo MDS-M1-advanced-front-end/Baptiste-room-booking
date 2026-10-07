@@ -1,6 +1,6 @@
 import type { Room, User } from '@room-booking/core';
 import { describe, expect, it } from 'vitest';
-import { canManage, ownedRooms } from './rooms';
+import { canManage, ownedRooms, roomPreview } from './rooms';
 
 const room = (id: string, ownerId?: string) =>
   ({
@@ -32,5 +32,49 @@ describe('ownedRooms', () => {
   it('rejects a client', () => {
     expect(ownedRooms(rooms, user('g1', 'CLIENT'))).toEqual([]);
     expect(canManage(rooms[0], user('g1', 'CLIENT'))).toBe(false);
+  });
+});
+
+describe('roomPreview', () => {
+  const form = (entries: [string, string][]) => {
+    const data = new FormData();
+    entries.forEach(([key, value]) => data.append(key, value));
+    return data;
+  };
+
+  it('mirrors the form over the edited room', () => {
+    const preview = roomPreview(
+      form([
+        ['name', 'Salle Rhône'],
+        ['location', 'Lyon 2e'],
+        ['capacity', '8'],
+        ['pricePerHour', '30'],
+        ['equipment[]', 'Wi-Fi'],
+        ['equipment[]', 'Cuisine'],
+        ['imageUrl', ''],
+      ]),
+      { ...room('a', 'g1'), status: 'INACTIVE' },
+    );
+    expect(preview).toMatchObject({
+      id: 'a',
+      status: 'INACTIVE',
+      name: 'Salle Rhône',
+      location: 'Lyon 2e',
+      capacity: 8,
+      pricePerHour: 30,
+      equipment: ['Wi-Fi', 'Cuisine'],
+      imageUrl: undefined,
+    });
+  });
+
+  it('falls back to placeholders for an empty new room', () => {
+    expect(roomPreview(form([['capacity', 'abc']]))).toMatchObject({
+      id: '',
+      status: 'ACTIVE',
+      name: 'Nouvelle salle',
+      capacity: 0,
+      pricePerHour: 0,
+      equipment: [],
+    });
   });
 });

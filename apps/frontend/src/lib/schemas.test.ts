@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { z } from '@builder.io/qwik-city';
-import { loginShape, profileShape, registerShape, reservationSchema } from './schemas';
+import { loginShape, profileShape, registerShape, reservationSchema, roomShape } from './schemas';
 
 const login = z.object(loginShape);
 const register = z.object(registerShape);
 const profile = z.object(profileShape);
+const room = z.object(roomShape);
 
 const firstIssue = (result: z.SafeParseReturnType<unknown, unknown>) =>
   result.success ? undefined : result.error.issues[0];
@@ -96,5 +97,46 @@ describe('reservationSchema', () => {
     [{ endTime: '14:00' }, 'endTime'],
   ])('rejects %o on %s', (patch, path) => {
     expect(firstIssue(reservationSchema.safeParse({ ...valid, ...patch }))?.path).toEqual([path]);
+  });
+});
+
+describe('roomShape', () => {
+  const valid = {
+    name: 'Salle Voltaire',
+    location: 'Paris 11e',
+    capacity: '12',
+    pricePerHour: '45.5',
+    imageUrl: '',
+  };
+
+  it('coerces numbers and drops an empty photo', () => {
+    expect(room.parse(valid)).toEqual({
+      name: 'Salle Voltaire',
+      location: 'Paris 11e',
+      capacity: 12,
+      pricePerHour: 45.5,
+      equipment: [],
+      imageUrl: undefined,
+    });
+  });
+
+  it('keeps equipment and a photo url', () => {
+    const parsed = room.parse({ ...valid, equipment: ['Wi-Fi'], imageUrl: 'https://x.fr/a.jpg' });
+    expect(parsed.equipment).toEqual(['Wi-Fi']);
+    expect(parsed.imageUrl).toBe('https://x.fr/a.jpg');
+  });
+
+  it.each([
+    ['name', { name: '  ' }],
+    ['location', { location: '' }],
+    ['capacity', { capacity: '0' }],
+    ['capacity', { capacity: '1.5' }],
+    ['capacity', { capacity: '' }],
+    ['pricePerHour', { pricePerHour: '-1' }],
+    ['pricePerHour', { pricePerHour: '' }],
+    ['pricePerHour', { pricePerHour: 'abc' }],
+    ['imageUrl', { imageUrl: 'not a url' }],
+  ])('rejects a bad %s', (field, patch) => {
+    expect(firstIssue(room.safeParse({ ...valid, ...patch }))?.path).toEqual([field]);
   });
 });
