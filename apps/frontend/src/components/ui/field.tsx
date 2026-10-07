@@ -117,3 +117,14 @@ export const Checkbox = component$<PropsOf<'input'> & { label: string }>(
     </label>
   ),
 );
+
+type TextFieldProps = Omit<FieldProps, 'class'> &
+  Omit<InputProps, 'id'> & { fieldClass?: ClassList };
+
+export const TextField = component$<TextFieldProps>(
+  ({ id, label, hint, error, required, fieldClass, ...input }) => (
+    <Field id={id} label={label} hint={hint} error={error} required={required} class={fieldClass}>
+      <Input {...input} {...fieldA11y({ id, hint, error })} required={required} />
+    </Field>
+  ),
+);
