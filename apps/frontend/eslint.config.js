@@ -60,7 +60,9 @@ export default tseslint.config(
         ...globals.serviceworker,
       },
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['.storybook/*.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },

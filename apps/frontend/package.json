@@ -20,6 +20,8 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
     "qwik": "qwik",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
@@ -35,6 +37,8 @@
     "globals": "16.4.0",
     "prettier": "3.6.2",
     "qwik-image": "^1.0.0",
+    "storybook": "^10.6.1",
+    "storybook-framework-qwik": "^0.6.1",
     "tailwindcss": "^4.3.3",
     "typescript": "5.4.5",
     "typescript-eslint": "8.70.1",
