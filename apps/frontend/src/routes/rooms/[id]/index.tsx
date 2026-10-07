@@ -19,7 +19,7 @@ import { DayNav, SlotPicker } from '~/components/booking/slot-picker';
 import { RoomPhoto } from '~/components/room-card/room-card';
 import { Alert } from '~/components/ui/alert';
 import { Button, ButtonLink } from '~/components/ui/button';
-import { CARD, CARD_BODY } from '~/components/ui/card';
+import { ASIDE_LAYOUT, CARD, CARD_BODY } from '~/components/ui/card';
 import { ChipList } from '~/components/ui/chip-list';
 import { ErrorSummary, collectErrors } from '~/components/ui/error-summary';
 import { Field, Textarea, TextField, fieldA11y } from '~/components/ui/field';
@@ -188,7 +188,7 @@ export default component$(() => {
   return (
     <>
       <BackLink href="/rooms/" label="Retour aux résultats" />
-      <div class="grid items-start gap-(--space-5) lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class={ASIDE_LAYOUT}>
         <div class="flex flex-col gap-(--space-6)">
           <RoomPhoto room={value} hero />
           <div class="flex flex-col gap-(--space-2)">

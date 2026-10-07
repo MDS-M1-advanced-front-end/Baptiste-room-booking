@@ -3,6 +3,7 @@ import {
   formatAmount,
   formatDay,
   formatDuration,
+  formatParisDate,
   formatHours,
   formatRate,
   formatShortDay,
@@ -75,5 +76,16 @@ describe('formatDuration', () => {
     [90, '1,5 h'],
   ])('formats %i minutes as %s', (minutes, label) => {
     expect(formatDuration(minutes)).toBe(label);
+  });
+});
+
+describe('formatParisDate', () => {
+  it('formats an instant on its Paris calendar day', () => {
+    expect(formatParisDate('2026-02-11T09:00:00Z')).toBe('11 février 2026');
+    expect(formatParisDate('2026-02-10T23:30:00Z')).toBe('11 février 2026');
+  });
+
+  it.each(['nope', ''])('returns invalid instant %s unchanged', (input) => {
+    expect(formatParisDate(input)).toBe(input);
   });
 });

@@ -44,3 +44,15 @@ const dayFormatter = (format: Intl.DateTimeFormat) => (day: string) =>
 export const formatDay = dayFormatter(longDay);
 
 export const formatShortDay = dayFormatter(shortDay);
+
+const parisDate = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'Europe/Paris',
+});
+
+export const formatParisDate = (iso: string) => {
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : parisDate.format(date);
+};

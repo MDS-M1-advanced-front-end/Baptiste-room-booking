@@ -1,5 +1,5 @@
 import { component$, Slot } from '@builder.io/qwik';
-import type { ReservationStatus } from '@room-booking/core';
+import type { ReservationStatus, UserRole } from '@room-booking/core';
 
 export type BadgeTone =
   'pending' | 'confirmed' | 'rejected' | 'cancelled' | 'completed' | 'neutral';
@@ -22,6 +22,12 @@ export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
   REJECTED: 'Refusée',
   CANCELLED: 'Annulée',
   COMPLETED: 'Terminée',
+};
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  CLIENT: 'Client',
+  GESTIONNAIRE: 'Gestionnaire',
+  ADMINISTRATEUR: 'Administrateur',
 };
 
 const STATUS_TONES: Record<ReservationStatus, BadgeTone> = {
