@@ -2,6 +2,7 @@ import { $ } from "@builder.io/qwik";
 import { useImageProvider, type ImageTransformerProps } from "qwik-image";
 
 const DIMENSIONS = /\/(\d+)\/(\d+)$/;
+const ROOM_IMAGE_WIDTHS = [320, 400, 640, 800];
 
 export function resizeImage({ src, width, height }: ImageTransformerProps) {
   const match = DIMENSIONS.exec(src);
@@ -13,8 +14,15 @@ export function resizeImage({ src, width, height }: ImageTransformerProps) {
   );
 }
 
+export function roomImageSrcSet(src: string) {
+  if (!DIMENSIONS.test(src)) return undefined;
+  return ROOM_IMAGE_WIDTHS.map(
+    (width) => `${resizeImage({ src, width, height: undefined })} ${width}w`,
+  ).join(", ");
+}
+
 export const useRoomImages = () =>
   useImageProvider({
-    resolutions: [400, 800, 1200, 1600],
+    resolutions: [400, 800, 1200],
     imageTransformer$: $(resizeImage),
   });

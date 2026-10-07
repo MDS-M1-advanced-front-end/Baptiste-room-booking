@@ -1,13 +1,13 @@
 import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 import type { Room } from "@room-booking/core";
-import { Image } from "qwik-image";
 import { Badge } from "~/components/ui/badge";
 import { CARD } from "~/components/ui/card";
 import { ChipList } from "~/components/ui/chip-list";
 import { Icon } from "~/components/ui/icon";
 import { Meta, MetaItem } from "~/components/ui/page-header";
 import { formatRate } from "~/lib/format";
+import { roomImageSrcSet } from "~/lib/image";
 
 const PHOTO_FRAMES = {
   card: "aspect-video w-full",
@@ -26,21 +26,22 @@ export const RoomPhoto = component$<{
   ];
   const hero = variant === "hero";
   return room.imageUrl ? (
-    <Image
+    <img
       src={room.imageUrl}
-      alt=""
-      layout={variant === "thumb" ? "fixed" : "fullWidth"}
-      width={variant === "thumb" ? 48 : undefined}
-      height={variant === "thumb" ? 36 : undefined}
-      objectFit="cover"
-      placeholder="var(--color-action-subtle)"
-      loading={hero || priority ? "eager" : "lazy"}
-      fetchpriority={hero || priority ? "high" : undefined}
+      srcset={roomImageSrcSet(room.imageUrl)}
       sizes={
         variant === "thumb"
           ? "48px"
-          : "(min-width: 64rem) 30vw, calc(100vw - 2rem)"
+          : hero
+            ? "(min-width: 64rem) 66vw, calc(100vw - 2rem)"
+            : "(min-width: 64rem) 30vw, calc((100vw - 2rem - 1rem) / 2)"
       }
+      alt=""
+      width={variant === "thumb" ? 48 : undefined}
+      height={variant === "thumb" ? 36 : undefined}
+      decoding="async"
+      loading={hero || priority ? "eager" : "lazy"}
+      fetchPriority={hero || priority ? "high" : "auto"}
       class={["block", frame]}
     />
   ) : (

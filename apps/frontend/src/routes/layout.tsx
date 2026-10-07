@@ -12,7 +12,6 @@ import {
 } from "~/components/layout/site-header";
 import { api } from "~/lib/api/client.server";
 import { HOME, USER_KEY, currentUser } from "~/lib/auth.server";
-import { useRoomImages } from "~/lib/image";
 import { isManager } from "~/lib/navigation";
 import { clearToken, readToken } from "~/lib/session.server";
 
@@ -43,7 +42,6 @@ export const useLogout = routeAction$((_, event) => {
 });
 
 export default component$(() => {
-  useRoomImages();
   const user = useCurrentUser();
   const pendingCount = usePendingCount();
   const logout = useLogout();
