@@ -1,6 +1,6 @@
 import type { Reservation, ReservationStatus } from '@room-booking/core';
 import { describe, expect, it } from 'vitest';
-import { canEdit, slotLabel, slotSentence, splitByTime } from './bookings';
+import { canEdit, slotLabel, slotSentence, splitByTime, splitRequests } from './bookings';
 
 const now = new Date('2026-10-10T12:00:00Z');
 
@@ -63,5 +63,17 @@ describe('slot labels', () => {
 
   it('formats the sentence Paris slot', () => {
     expect(slotSentence(future)).toBe('lundi 12 octobre 2026, de 11:00 à 14:00');
+  });
+});
+
+describe('splitRequests', () => {
+  it('puts pending requests first, soonest first, and the rest in handled', () => {
+    const { pending, handled } = splitRequests([rejected, later, future, ended]);
+    expect(pending.map((item) => item.id)).toEqual(['later']);
+    expect(handled.map((item) => item.id)).toEqual(['ended', 'future', 'rejected']);
+  });
+
+  it('rejects nothing into pending when no request is PENDING', () => {
+    expect(splitRequests([future, ended]).pending).toEqual([]);
   });
 });

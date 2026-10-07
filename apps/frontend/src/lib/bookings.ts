@@ -8,11 +8,20 @@ const time = (iso: string) => Date.parse(iso);
 const isUpcoming = (reservation: Reservation, now: Date) =>
   ACTIVE.has(reservation.status) && time(reservation.endAt) >= now.getTime();
 
+const byStart = (a: Reservation, b: Reservation) => time(a.startAt) - time(b.startAt);
+
 export function splitByTime(reservations: Reservation[], now: Date) {
-  const byStart = (a: Reservation, b: Reservation) => time(a.startAt) - time(b.startAt);
   return {
     upcoming: reservations.filter((item) => isUpcoming(item, now)).sort(byStart),
     past: reservations.filter((item) => !isUpcoming(item, now)).sort((a, b) => byStart(b, a)),
+  };
+}
+
+export function splitRequests(reservations: Reservation[]) {
+  const sorted = [...reservations].sort(byStart);
+  return {
+    pending: sorted.filter((item) => item.status === 'PENDING'),
+    handled: sorted.filter((item) => item.status !== 'PENDING'),
   };
 }
 

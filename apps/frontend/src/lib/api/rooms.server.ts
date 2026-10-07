@@ -1,20 +1,28 @@
 import type { RequestEventBase, RequestEventLoader } from '@builder.io/qwik-city';
-import { getRoomsByRoomId, type Client, type Room } from '@room-booking/core';
+import {
+  getReservationsByReservationId,
+  getRoomsByRoomId,
+  getUsersByUserId,
+  type Client,
+} from '@room-booking/core';
 import { api } from '~/lib/api/client.server';
 import { requireRole } from '~/lib/auth.server';
 import { MANAGER_ROLES } from '~/lib/navigation';
 import { canManage } from '~/lib/rooms';
 
-export async function roomsById(client: Client, ids: string[]) {
-  const rooms = await Promise.all(
-    [...new Set(ids)].map(
-      async (roomId) => (await getRoomsByRoomId({ client, path: { roomId } })).data,
-    ),
-  );
-  return Object.fromEntries(
-    rooms.filter((room): room is Room => !!room).map((room) => [room.id, room]),
-  );
+async function byId<T extends { id: string }>(
+  ids: string[],
+  get: (id: string) => Promise<{ data?: T }>,
+) {
+  const items = await Promise.all([...new Set(ids)].map(async (id) => (await get(id)).data));
+  return Object.fromEntries(items.flatMap((item) => (item ? [[item.id, item] as const] : [])));
 }
+
+export const roomsById = (client: Client, ids: string[]) =>
+  byId(ids, (roomId) => getRoomsByRoomId({ client, path: { roomId } }));
+
+export const usersById = (client: Client, ids: string[]) =>
+  byId(ids, (userId) => getUsersByUserId({ client, path: { userId } }));
 
 type ManagerEvent = Parameters<typeof requireRole>[0] & RequestEventBase;
 
@@ -31,4 +39,21 @@ export async function loadManagedRoom(event: RequestEventLoader) {
   const { room, allowed } = await managedRoom(event);
   if (!allowed) event.status(room ? 403 : 404);
   return allowed ? room! : null;
+}
+
+export async function managedReservation(event: ManagerEvent, reservationId: string) {
+  const user = requireRole(event, MANAGER_ROLES);
+  const client = api(event);
+  const { data: reservation } = await getReservationsByReservationId({
+    client,
+    path: { reservationId },
+  });
+  if (!reservation) return { status: 404 } as const;
+  const { data: room } = await getRoomsByRoomId({ client, path: { roomId: reservation.roomId } });
+  if (!room || !canManage(room, user)) return { status: 403 } as const;
+  const { data: requester } = await getUsersByUserId({
+    client,
+    path: { userId: reservation.userId },
+  });
+  return { status: 200, reservation, room, requester } as const;
 }
