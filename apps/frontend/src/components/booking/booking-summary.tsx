@@ -10,17 +10,23 @@ export const BookingSummary = component$<{
   slots: AvailabilitySlot[];
   selection: Signal<SlotRange | null>;
   pricePerHour: number;
-}>(({ day, slots, selection, pricePerHour }) => {
+  before?: string;
+}>(({ day, slots, selection, pricePerHour, before }) => {
   const range = selection.value;
   const minutes = range ? rangeMinutes(slots, range) : 0;
+  const hours = range
+    ? `${formatTime(slots[range.start].startTime)} – ${formatTime(slots[range.end].endTime)}`
+    : '–';
   const rows: [string, string][] = [
-    ['Date', formatShortDay(day)],
-    [
-      'Horaire',
-      range
-        ? `${formatTime(slots[range.start].startTime)} – ${formatTime(slots[range.end].endTime)}`
-        : '–',
-    ],
+    ...((before
+      ? [
+          ['Avant', before],
+          ['Après', range ? `${formatShortDay(day)} · ${hours}` : '–'],
+        ]
+      : [
+          ['Date', formatShortDay(day)],
+          ['Horaire', hours],
+        ]) as [string, string][]),
     ['Durée', range ? `${formatDuration(minutes)} × ${formatAmount(pricePerHour)}` : '–'],
   ];
   return (
@@ -35,7 +41,9 @@ export const BookingSummary = component$<{
           </dd>
         </>
       ))}
-      <dt class={[totalClass, 'pr-(--space-4) text-(--color-text-muted)']}>Prix estimé</dt>
+      <dt class={[totalClass, 'pr-(--space-4) text-(--color-text-muted)']}>
+        {before ? 'Nouveau prix estimé' : 'Prix estimé'}
+      </dt>
       <dd
         class={[
           totalClass,

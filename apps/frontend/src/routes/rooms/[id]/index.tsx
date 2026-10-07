@@ -9,29 +9,29 @@ import {
 } from '@builder.io/qwik-city';
 import {
   getRoomsByRoomId,
-  getRoomsByRoomIdAvailability,
   postReservations,
   type AvailabilitySlot,
   type Room,
 } from '@room-booking/core';
+import { BOOKING_FIELDS, BookingFields } from '~/components/booking/booking-fields';
 import { BookingSummary } from '~/components/booking/booking-summary';
-import { DayNav, SlotPicker } from '~/components/booking/slot-picker';
+import { SlotCard } from '~/components/booking/slot-picker';
 import { RoomPhoto } from '~/components/room-card/room-card';
 import { Alert } from '~/components/ui/alert';
 import { Button, ButtonLink } from '~/components/ui/button';
-import { ASIDE_LAYOUT, CARD, CARD_BODY } from '~/components/ui/card';
+import { ASIDE_LAYOUT, CARD_BODY, STICKY_ASIDE } from '~/components/ui/card';
 import { ChipList } from '~/components/ui/chip-list';
 import { ErrorSummary, collectErrors } from '~/components/ui/error-summary';
-import { Field, Textarea, TextField, fieldA11y } from '~/components/ui/field';
 import { BackLink, EmptyState, Meta, MetaItem } from '~/components/ui/page-header';
+import { loadAvailability } from '~/lib/api/availability.server';
 import { api } from '~/lib/api/client.server';
 import { currentUser } from '~/lib/auth.server';
-import { parisIso, parisToday } from '~/lib/dates';
+import { capacityError, reservationTimes } from '~/lib/booking-request';
+import { parisToday } from '~/lib/dates';
 import { formatRate } from '~/lib/format';
 import { reservationError } from '~/lib/reservation-errors';
-import { COMMENT_MAX, reservationSchema } from '~/lib/schemas';
+import { reservationSchema } from '~/lib/schemas';
 import type { SlotRange } from '~/lib/slots';
-import { isoDate } from '~/lib/url-params';
 import { useCurrentUser } from '~/routes/layout';
 
 export const useRoom = routeLoader$(async (event) => {
@@ -43,54 +43,26 @@ export const useRoom = routeLoader$(async (event) => {
   return data ?? null;
 });
 
-export const useAvailability = routeLoader$(async (event) => {
-  const today = parisToday();
-  const requested = isoDate(event.url.searchParams.get('date'));
-  const day = requested && requested > today ? requested : today;
-  const room = await event.resolveValue(useRoom);
-  if (!room) return { today, day, slots: null };
-  const { data } = await getRoomsByRoomIdAvailability({
-    client: api(event),
-    path: { roomId: room.id },
-    query: { date: day },
-  });
-  return { today, day, slots: data ?? null };
-});
+export const useAvailability = routeLoader$(async (event) =>
+  loadAvailability(event, (await event.resolveValue(useRoom))?.id, parisToday()),
+);
 
 export const useCreateReservation = routeAction$(async (input, event) => {
   if (!currentUser(event)) return event.fail(401, { message: reservationError(401) });
   const client = api(event);
   const { data: room } = await getRoomsByRoomId({ client, path: { roomId: event.params.id } });
   if (!room) return event.fail(404, { message: reservationError(404) });
-  if (input.numberOfParticipants > room.capacity) {
-    return event.fail(400, {
-      fieldErrors: {
-        numberOfParticipants: `La salle accueille ${room.capacity} personnes au maximum.`,
-      },
-    });
-  }
+  const tooMany = capacityError(room.capacity, input.numberOfParticipants);
+  if (tooMany) return event.fail(400, { fieldErrors: { numberOfParticipants: tooMany } });
   const { data, response } = await postReservations({
     client,
-    body: {
-      roomId: room.id,
-      startAt: parisIso(input.date, input.startTime),
-      endAt: parisIso(input.date, input.endTime),
-      numberOfParticipants: input.numberOfParticipants,
-      comment: input.comment || undefined,
-    },
+    body: { roomId: room.id, ...reservationTimes(input) },
   });
   if (!data) {
     return event.fail(response?.status ?? 500, { message: reservationError(response?.status) });
   }
   throw event.redirect(303, '/bookings/?status=PENDING');
 }, zod$(reservationSchema));
-
-const FIELDS = {
-  numberOfParticipants: 'Nombre de participants',
-  comment: 'Commentaire',
-  startTime: 'Créneau',
-  endTime: 'Créneau',
-};
 
 const BookingForm = component$<{
   room: Room;
@@ -115,40 +87,25 @@ const BookingForm = component$<{
       </ButtonLink>
     );
   }
-  const range = selection.value;
   const errors: Partial<Record<string, string>> | undefined = create.value?.fieldErrors;
   return (
     <Form action={create} class="flex flex-col gap-(--space-4)" noValidate>
-      <ErrorSummary errors={collectErrors(FIELDS, errors)} action="la réservation" />
+      <ErrorSummary errors={collectErrors(BOOKING_FIELDS, errors)} action="la réservation" />
       {create.value?.failed && create.value.message && (
         <Alert tone="danger" title="Réservation impossible">
           <p>{create.value.message}</p>
         </Alert>
       )}
-      <input type="hidden" name="date" value={day} />
-      <input type="hidden" name="startTime" value={range ? slots[range.start].startTime : ''} />
-      <input type="hidden" name="endTime" value={range ? slots[range.end].endTime : ''} />
-      <TextField
-        id="numberOfParticipants"
-        label={FIELDS.numberOfParticipants}
-        type="number"
-        inputMode="numeric"
-        min={1}
-        max={room.capacity}
-        required
-        hint={`${room.capacity} personnes maximum`}
-        value={create.formData?.get('numberOfParticipants')?.toString()}
-        error={errors?.numberOfParticipants}
+      <BookingFields
+        day={day}
+        slots={slots}
+        selection={selection}
+        capacity={room.capacity}
+        errors={errors}
+        participants={create.formData?.get('numberOfParticipants')?.toString()}
+        comment={create.formData?.get('comment')?.toString()}
       />
-      <Field id="comment" label={FIELDS.comment} hint="Facultatif" error={errors?.comment}>
-        <Textarea
-          {...fieldA11y({ id: 'comment', hint: 'Facultatif', error: errors?.comment })}
-          rows={3}
-          maxLength={COMMENT_MAX}
-          value={create.formData?.get('comment')?.toString()}
-        />
-      </Field>
-      <Button type="submit" block disabled={!range} busy={create.isRunning}>
+      <Button type="submit" block disabled={!selection.value} busy={create.isRunning}>
         Demander la réservation
       </Button>
       <p class="text-(length:--font-size-sm) text-(--color-text-muted)">
@@ -206,24 +163,15 @@ export default component$(() => {
               <ChipList items={value.equipment} />
             </section>
           ) : null}
-          <section aria-labelledby="slots-title" class={CARD}>
-            <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
-              <h2 id="slots-title">Choisir un créneau</h2>
-              <DayNav day={day} min={today} />
-              {slots ? (
-                <SlotPicker day={day} slots={slots} selection={selection} />
-              ) : (
-                <Alert tone="danger" title="Les créneaux n'ont pas pu être chargés">
-                  <p>Le serveur ne répond pas. Choisissez une autre date ou réessayez.</p>
-                </Alert>
-              )}
-            </div>
-          </section>
+          <SlotCard
+            title="Choisir un créneau"
+            today={today}
+            day={day}
+            slots={slots}
+            selection={selection}
+          />
         </div>
-        <aside
-          aria-labelledby="booking-title"
-          class={[CARD, 'lg:sticky lg:top-[calc(4rem+var(--space-4))]']}
-        >
+        <aside aria-labelledby="booking-title" class={STICKY_ASIDE}>
           <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
             <h2 id="booking-title">Votre réservation</h2>
             <BookingSummary

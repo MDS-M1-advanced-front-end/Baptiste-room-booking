@@ -71,3 +71,28 @@ describe('SlotPicker', () => {
     expect(text(screen)).toContain('Aucun créneau ouvert ce jour.');
   });
 });
+
+describe('BookingSummary before and after', () => {
+  const Edit = component$(() => {
+    const selection = useSignal<SlotRange | null>({ start: 2, end: 3 });
+    return (
+      <BookingSummary
+        day="2026-11-16"
+        slots={slots}
+        selection={selection}
+        pricePerHour={45}
+        before="lun. 16 nov. · 08:00 – 09:00 · 45,00 €"
+      />
+    );
+  });
+
+  it('compares the current booking with the new slot', async () => {
+    const { screen, render } = await createDOM();
+    await render(<Edit />);
+    expect(text(screen)).toContain('Avant');
+    expect(text(screen)).toContain('Après');
+    expect(text(screen)).toContain('lun. 16 nov. 2026 · 10:00 – 12:00');
+    expect(text(screen)).toContain('Nouveau prix estimé');
+    expect(text(screen)).toContain('90,00 €');
+  });
+});

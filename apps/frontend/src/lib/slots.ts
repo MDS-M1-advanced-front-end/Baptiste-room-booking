@@ -34,3 +34,14 @@ export function rangeMinutes(slots: AvailabilitySlot[], range: SlotRange) {
 
 export const estimatePrice = (pricePerHour: number, mins: number) =>
   Math.round(((pricePerHour * mins) / 60) * 100) / 100;
+
+export const withOwnSlots = (slots: AvailabilitySlot[], start: string, end: string) =>
+  slots.map((slot) =>
+    slot.startTime >= start && slot.endTime <= end ? { ...slot, available: true } : slot,
+  );
+
+export function rangeOf(slots: AvailabilitySlot[], start: string, end: string): SlotRange | null {
+  const first = slots.findIndex((slot) => slot.startTime === start);
+  const last = slots.findIndex((slot) => slot.endTime === end);
+  return first >= 0 && last >= first ? { start: first, end: last } : null;
+}

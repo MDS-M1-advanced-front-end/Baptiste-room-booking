@@ -1,6 +1,6 @@
 import type { AvailabilitySlot } from '@room-booking/core';
 import { describe, expect, it } from 'vitest';
-import { estimatePrice, rangeMinutes, selectSlot } from './slots';
+import { estimatePrice, rangeMinutes, rangeOf, selectSlot, withOwnSlots } from './slots';
 
 const slots: AvailabilitySlot[] = [
   { startTime: '08:00', endTime: '09:00', available: true },
@@ -50,5 +50,30 @@ describe('rangeMinutes and estimatePrice', () => {
 
   it('rejects a range outside the slots: zero minutes', () => {
     expect(rangeMinutes(slots, { start: 7, end: 9 })).toBe(0);
+  });
+});
+
+describe('withOwnSlots', () => {
+  it('frees the slots held by the edited booking', () => {
+    const own = withOwnSlots(slots, '09:00', '10:00');
+    expect(own.map((slot) => slot.available)).toEqual([true, true, true, true, true]);
+  });
+
+  it('rejects freeing slots outside the booking', () => {
+    expect(withOwnSlots(slots, '10:00', '11:00')[1].available).toBe(false);
+  });
+});
+
+describe('rangeOf', () => {
+  it('finds the slot range matching a booking', () => {
+    expect(rangeOf(slots, '10:00', '12:00')).toEqual({ start: 2, end: 3 });
+  });
+
+  it.each([
+    ['07:00', '09:00'],
+    ['10:30', '12:00'],
+    ['10:00', '14:00'],
+  ])('rejects %s to %s not aligned on slots', (start, end) => {
+    expect(rangeOf(slots, start, end)).toBeNull();
   });
 });

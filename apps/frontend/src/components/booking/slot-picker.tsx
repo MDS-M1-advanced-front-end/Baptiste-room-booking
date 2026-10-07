@@ -1,7 +1,9 @@
 import { component$, useId, type Signal } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
 import type { AvailabilitySlot } from '@room-booking/core';
+import { Alert } from '~/components/ui/alert';
 import { buttonClass } from '~/components/ui/button';
+import { CARD, CARD_BODY } from '~/components/ui/card';
 import { controlClass } from '~/components/ui/field';
 import { Icon } from '~/components/ui/icon';
 import { addDays } from '~/lib/dates';
@@ -132,5 +134,30 @@ export const SlotPicker = component$<{
         </li>
       </ul>
     </div>
+  );
+});
+
+export const SlotCard = component$<{
+  title: string;
+  today: string;
+  day: string;
+  slots: AvailabilitySlot[] | null;
+  selection: Signal<SlotRange | null>;
+}>(({ title, today, day, slots, selection }) => {
+  const titleId = useId();
+  return (
+    <section aria-labelledby={titleId} class={CARD}>
+      <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
+        <h2 id={titleId}>{title}</h2>
+        <DayNav day={day} min={today} />
+        {slots ? (
+          <SlotPicker day={day} slots={slots} selection={selection} />
+        ) : (
+          <Alert tone="danger" title="Les créneaux n'ont pas pu être chargés">
+            <p>Le serveur ne répond pas. Choisissez une autre date ou réessayez.</p>
+          </Alert>
+        )}
+      </div>
+    </section>
   );
 });
