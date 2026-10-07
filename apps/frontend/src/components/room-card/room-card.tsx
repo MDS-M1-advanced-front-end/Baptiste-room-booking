@@ -15,48 +15,51 @@ const PHOTO_FRAMES = {
   thumb: 'h-9 w-12 flex-none rounded-(--radius-sm)',
 };
 
-export const RoomPhoto = component$<{ room: Room; variant?: keyof typeof PHOTO_FRAMES }>(
-  ({ room, variant = 'card' }) => {
-    const frame = [PHOTO_FRAMES[variant], room.status === 'INACTIVE' && 'grayscale'];
-    const hero = variant === 'hero';
-    return room.imageUrl ? (
-      <Image
-        src={room.imageUrl}
-        alt=""
-        layout={variant === 'thumb' ? 'fixed' : 'fullWidth'}
-        width={variant === 'thumb' ? 48 : undefined}
-        height={variant === 'thumb' ? 36 : undefined}
-        objectFit="cover"
-        placeholder="var(--color-action-subtle)"
-        loading={hero ? 'eager' : 'lazy'}
-        fetchpriority={hero ? 'high' : undefined}
-        class={['block', frame]}
+export const RoomPhoto = component$<{
+  room: Room;
+  variant?: keyof typeof PHOTO_FRAMES;
+  priority?: boolean;
+}>(({ room, variant = 'card', priority = false }) => {
+  const frame = [PHOTO_FRAMES[variant], room.status === 'INACTIVE' && 'grayscale'];
+  const hero = variant === 'hero';
+  return room.imageUrl ? (
+    <Image
+      src={room.imageUrl}
+      alt=""
+      layout={variant === 'thumb' ? 'fixed' : 'fullWidth'}
+      width={variant === 'thumb' ? 48 : undefined}
+      height={variant === 'thumb' ? 36 : undefined}
+      objectFit="cover"
+      placeholder="var(--color-action-subtle)"
+      loading={hero || priority ? 'eager' : 'lazy'}
+      fetchpriority={hero || priority ? 'high' : undefined}
+      sizes={variant === 'thumb' ? '48px' : '(min-width: 64rem) 30vw, calc(100vw - 2rem)'}
+      class={['block', frame]}
+    />
+  ) : (
+    <div
+      aria-hidden="true"
+      class={['grid place-items-center bg-(--color-action-subtle) text-(--color-action)', frame]}
+    >
+      <Icon
+        name="building"
+        class={[
+          'rounded-(--radius-full) bg-(--color-surface) stroke-[1.5]',
+          variant === 'thumb' ? 'size-6 p-(--space-1)' : 'size-10 p-(--space-2)',
+        ]}
       />
-    ) : (
-      <div
-        aria-hidden="true"
-        class={['grid place-items-center bg-(--color-action-subtle) text-(--color-action)', frame]}
-      >
-        <Icon
-          name="building"
-          class={[
-            'rounded-(--radius-full) bg-(--color-surface) stroke-[1.5]',
-            variant === 'thumb' ? 'size-6 p-(--space-1)' : 'size-10 p-(--space-2)',
-          ]}
-        />
-      </div>
-    );
-  },
-);
+    </div>
+  );
+});
 
-export const RoomCard = component$<{ room: Room }>(({ room }) => (
+export const RoomCard = component$<{ room: Room; priority?: boolean }>(({ room, priority }) => (
   <article
     class={[
       CARD,
       'relative flex h-full flex-col overflow-hidden transition-shadow duration-(--duration-fast) ease-(--easing-standard) outline-offset-(--focus-ring-offset) outline-(--color-focus) hover:shadow-(--shadow-md) has-[a:focus-visible]:outline-(length:--focus-ring-width) has-[a:focus-visible]:outline-solid',
     ]}
   >
-    <RoomPhoto room={room} />
+    <RoomPhoto room={room} priority={priority} />
     <div class="flex flex-1 flex-col gap-(--space-2) p-(--space-4)">
       <h3 class="text-(length:--font-size-lg) leading-(--line-height-tight) font-(--font-weight-bold)">
         <Link

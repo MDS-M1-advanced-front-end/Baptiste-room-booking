@@ -185,9 +185,9 @@ export default component$(() => {
             <>
               <Summary query={query} total={result.total} />
               <ul class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-(--space-4)">
-                {result.items.map((room) => (
+                {result.items.map((room, index) => (
                   <li key={room.id}>
-                    <RoomCard room={room} />
+                    <RoomCard room={room} priority={index === 0} />
                   </li>
                 ))}
               </ul>
