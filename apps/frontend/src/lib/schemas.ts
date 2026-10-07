@@ -82,3 +82,35 @@ export const roomShape = {
     .optional()
     .or(z.literal('').transform(() => undefined)),
 };
+
+const slotJson = z.string().transform((value, ctx) => {
+  try {
+    return JSON.parse(value) as unknown;
+  } catch {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Créneaux illisibles. Réessayez.' });
+    return z.NEVER;
+  }
+});
+
+const TIME_MESSAGE = 'Saisissez des heures au format HH:MM.';
+const editedTime = z.string().refine((value) => !!timeOfDay(value), TIME_MESSAGE);
+
+export const availabilityShape = {
+  date: z.string().refine((value) => !!isoDate(value), 'Choisissez une date valide.'),
+  slots: slotJson.pipe(
+    z
+      .array(z.object({ startTime: editedTime, endTime: editedTime, available: z.boolean() }))
+      .transform((slots) => [...slots].sort((a, b) => a.startTime.localeCompare(b.startTime)))
+      .superRefine((slots, ctx) => {
+        slots.forEach((slot, index) => {
+          const message =
+            slot.endTime <= slot.startTime
+              ? `Le créneau de ${slot.startTime} doit finir après son début.`
+              : slots[index - 1]?.endTime > slot.startTime
+                ? `Le créneau de ${slot.startTime} chevauche le précédent.`
+                : undefined;
+          if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+        });
+      }),
+  ),
+};

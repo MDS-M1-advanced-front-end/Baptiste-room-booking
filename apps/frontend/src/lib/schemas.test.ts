@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { z } from '@builder.io/qwik-city';
-import { loginShape, profileShape, registerShape, reservationSchema, roomShape } from './schemas';
+import {
+  availabilityShape,
+  loginShape,
+  profileShape,
+  registerShape,
+  reservationSchema,
+  roomShape,
+} from './schemas';
 
 const login = z.object(loginShape);
 const register = z.object(registerShape);
 const profile = z.object(profileShape);
 const room = z.object(roomShape);
+const availability = z.object(availabilityShape);
 
 const firstIssue = (result: z.SafeParseReturnType<unknown, unknown>) =>
   result.success ? undefined : result.error.issues[0];
@@ -138,5 +146,39 @@ describe('roomShape', () => {
     ['imageUrl', { imageUrl: 'not a url' }],
   ])('rejects a bad %s', (field, patch) => {
     expect(firstIssue(room.safeParse({ ...valid, ...patch }))?.path).toEqual([field]);
+  });
+});
+
+describe('availabilityShape', () => {
+  const slot = (startTime: string, endTime: string, available = true) => ({
+    startTime,
+    endTime,
+    available,
+  });
+  const day = (slots: unknown) => ({ date: '2026-11-16', slots: JSON.stringify(slots) });
+
+  it('parses and sorts the slots of a day', () => {
+    expect(
+      availability.parse(day([slot('12:00', '14:00', false), slot('08:00', '09:00')])),
+    ).toEqual({
+      date: '2026-11-16',
+      slots: [slot('08:00', '09:00'), slot('12:00', '14:00', false)],
+    });
+  });
+
+  it('accepts an empty day', () => {
+    expect(availability.parse(day([])).slots).toEqual([]);
+  });
+
+  it.each([
+    ['malformed JSON', { date: '2026-11-16', slots: '[{' }],
+    ['end before start', day([slot('10:00', '09:00')])],
+    ['empty range', day([slot('10:00', '10:00')])],
+    ['bad time', day([slot('08:00', '25:00')])],
+    ['overlap', day([slot('08:00', '10:00'), slot('09:00', '11:00')])],
+    ['not a list', day({ startTime: '08:00' })],
+    ['bad date', { ...day([]), date: '2026-02-30' }],
+  ])('rejects %s', (_, input) => {
+    expect(availability.safeParse(input).success).toBe(false);
   });
 });

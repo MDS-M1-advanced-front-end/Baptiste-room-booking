@@ -1,6 +1,14 @@
 import type { AvailabilitySlot } from '@room-booking/core';
 import { describe, expect, it } from 'vitest';
-import { estimatePrice, rangeMinutes, rangeOf, selectSlot, withOwnSlots } from './slots';
+import {
+  estimatePrice,
+  hourlySlots,
+  nextSlot,
+  rangeMinutes,
+  rangeOf,
+  selectSlot,
+  withOwnSlots,
+} from './slots';
 
 const slots: AvailabilitySlot[] = [
   { startTime: '08:00', endTime: '09:00', available: true },
@@ -75,5 +83,46 @@ describe('rangeOf', () => {
     ['10:00', '14:00'],
   ])('rejects %s to %s not aligned on slots', (start, end) => {
     expect(rangeOf(slots, start, end)).toBeNull();
+  });
+});
+
+describe('hourlySlots', () => {
+  it('splits ranges into one hour slots keeping availability', () => {
+    expect(
+      hourlySlots([
+        { startTime: '08:00', endTime: '09:00', available: true },
+        { startTime: '09:00', endTime: '11:30', available: false },
+      ]),
+    ).toEqual([
+      { startTime: '08:00', endTime: '09:00', available: true },
+      { startTime: '09:00', endTime: '10:00', available: false },
+      { startTime: '10:00', endTime: '11:00', available: false },
+      { startTime: '11:00', endTime: '11:30', available: false },
+    ]);
+  });
+
+  it('drops empty or inverted ranges', () => {
+    expect(hourlySlots([{ startTime: '10:00', endTime: '09:00', available: true }])).toEqual([]);
+  });
+});
+
+describe('nextSlot', () => {
+  it('starts a day at 08:00', () => {
+    expect(nextSlot([])).toEqual({ startTime: '08:00', endTime: '09:00', available: true });
+  });
+
+  it('follows the latest slot', () => {
+    expect(
+      nextSlot([
+        { startTime: '14:00', endTime: '15:30', available: false },
+        { startTime: '08:00', endTime: '09:00', available: true },
+      ]),
+    ).toEqual({ startTime: '15:30', endTime: '16:30', available: true });
+  });
+
+  it('never runs past midnight', () => {
+    expect(nextSlot([{ startTime: '22:00', endTime: '23:30', available: true }]).endTime).toBe(
+      '23:59',
+    );
   });
 });

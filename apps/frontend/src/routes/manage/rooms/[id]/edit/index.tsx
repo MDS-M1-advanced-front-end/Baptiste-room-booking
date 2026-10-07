@@ -1,35 +1,15 @@
 import { component$ } from '@builder.io/qwik';
-import {
-  routeAction$,
-  routeLoader$,
-  zod$,
-  type DocumentHead,
-  type RequestEventBase,
-} from '@builder.io/qwik-city';
-import { getRoomsByRoomId, patchRoomsByRoomId } from '@room-booking/core';
+import { routeAction$, routeLoader$, zod$, type DocumentHead } from '@builder.io/qwik-city';
+import { patchRoomsByRoomId } from '@room-booking/core';
 import { RoomForm } from '~/components/room-form/room-form';
 import { ButtonLink } from '~/components/ui/button';
 import { BackLink, EmptyState } from '~/components/ui/page-header';
 import { api } from '~/lib/api/client.server';
-import { requireRole } from '~/lib/auth.server';
-import { MANAGER_ROLES } from '~/lib/navigation';
-import { canManage, roomError } from '~/lib/rooms';
+import { loadManagedRoom, managedRoom } from '~/lib/api/rooms.server';
+import { roomError } from '~/lib/rooms';
 import { roomShape } from '~/lib/schemas';
 
-const managedRoom = async (event: Parameters<typeof requireRole>[0] & RequestEventBase) => {
-  const user = requireRole(event, MANAGER_ROLES);
-  const { data: room } = await getRoomsByRoomId({
-    client: api(event),
-    path: { roomId: event.params.id },
-  });
-  return { room, allowed: !!room && canManage(room, user) };
-};
-
-export const useEditedRoom = routeLoader$(async (event) => {
-  const { room, allowed } = await managedRoom(event);
-  if (!allowed) event.status(room ? 403 : 404);
-  return allowed ? room! : null;
-});
+export const useEditedRoom = routeLoader$((event) => loadManagedRoom(event));
 
 export const useUpdateRoom = routeAction$(async (body, event) => {
   const { room, allowed } = await managedRoom(event);

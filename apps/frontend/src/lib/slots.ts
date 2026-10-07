@@ -45,3 +45,30 @@ export function rangeOf(slots: AvailabilitySlot[], start: string, end: string): 
   const last = slots.findIndex((slot) => slot.endTime === end);
   return first >= 0 && last >= first ? { start: first, end: last } : null;
 }
+
+const clock = (mins: number) =>
+  `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+
+export const hourlySlots = (slots: AvailabilitySlot[]) =>
+  slots.flatMap(({ startTime, endTime, available }) => {
+    const hours: AvailabilitySlot[] = [];
+    for (let from = minutes(startTime); from < minutes(endTime); from += 60) {
+      hours.push({
+        startTime: clock(from),
+        endTime: clock(Math.min(from + 60, minutes(endTime))),
+        available,
+      });
+    }
+    return hours;
+  });
+
+const LAST_MINUTE = 23 * 60 + 59;
+
+export const nextSlot = (slots: AvailabilitySlot[]): AvailabilitySlot => {
+  const from = Math.max(8 * 60, ...slots.map((slot) => minutes(slot.endTime)));
+  return {
+    startTime: clock(from),
+    endTime: clock(Math.min(from + 60, LAST_MINUTE)),
+    available: true,
+  };
+};

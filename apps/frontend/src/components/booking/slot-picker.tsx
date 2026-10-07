@@ -12,40 +12,42 @@ import { rangeMinutes, selectSlot, type SlotRange } from '~/lib/slots';
 
 const navClass = buttonClass({ variant: 'secondary', size: 'icon' });
 
-export const DayNav = component$<{ day: string; min: string }>(({ day, min }) => (
-  <form method="get" class="flex flex-col gap-(--space-1)">
-    <label for="slot-date" class="font-(--font-weight-semibold)">
-      Date
-    </label>
-    <div class="flex items-center gap-(--space-2)">
-      {day > min ? (
-        <Link href={`?date=${addDays(day, -1)}`} class={navClass}>
-          <Icon name="left" />
-          <span class="sr-only">Jour précédent</span>
+export const DayNav = component$<{ day: string; min: string; label?: string }>(
+  ({ day, min, label = 'Date' }) => (
+    <form method="get" class="flex flex-col gap-(--space-1)">
+      <label for="slot-date" class="font-(--font-weight-semibold)">
+        {label}
+      </label>
+      <div class="flex items-center gap-(--space-2)">
+        {day > min ? (
+          <Link href={`?date=${addDays(day, -1)}`} class={navClass}>
+            <Icon name="left" />
+            <span class="sr-only">Jour précédent</span>
+          </Link>
+        ) : (
+          <span aria-disabled="true" class={navClass}>
+            <Icon name="left" />
+            <span class="sr-only">Jour précédent</span>
+          </span>
+        )}
+        <input
+          id="slot-date"
+          name="date"
+          type="date"
+          min={min}
+          value={day}
+          required
+          class={[controlClass, 'flex-1']}
+          onChange$={(_, input) => input.form?.requestSubmit()}
+        />
+        <Link href={`?date=${addDays(day, 1)}`} class={navClass}>
+          <Icon name="right" />
+          <span class="sr-only">Jour suivant</span>
         </Link>
-      ) : (
-        <span aria-disabled="true" class={navClass}>
-          <Icon name="left" />
-          <span class="sr-only">Jour précédent</span>
-        </span>
-      )}
-      <input
-        id="slot-date"
-        name="date"
-        type="date"
-        min={min}
-        value={day}
-        required
-        class={[controlClass, 'flex-1']}
-        onChange$={(_, input) => input.form?.requestSubmit()}
-      />
-      <Link href={`?date=${addDays(day, 1)}`} class={navClass}>
-        <Icon name="right" />
-        <span class="sr-only">Jour suivant</span>
-      </Link>
-    </div>
-  </form>
-));
+      </div>
+    </form>
+  ),
+);
 
 const slotClass = [
   'flex min-h-(--size-control) cursor-pointer flex-col items-center justify-center rounded-(--radius-md) border border-(--color-border-strong) bg-(--color-surface) px-(--space-2) py-(--space-1) font-(--font-weight-semibold) text-(--color-text) tabular-nums',
