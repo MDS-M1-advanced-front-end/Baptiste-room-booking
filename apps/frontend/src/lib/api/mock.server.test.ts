@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import type { PaginatedReservations, PaginatedRooms } from '@room-booking/core';
 import rooms from '../../../../../mock/data/rooms.json';
 import reservations from '../../../../../mock/data/reservations.json';
+import users from '../../../../../mock/data/users.json';
+import availability from '../../../../../mock/data/availability.json';
+import {
+  zAvailabilitySlot,
+  zReservation,
+  zRoom,
+  zUser,
+} from '../../../../../packages/core/src/api/generated/zod.gen';
 import { emulateList, preferFor } from './mock.server';
 
 const login = (email: string) =>
@@ -50,8 +58,12 @@ describe('preferFor', () => {
     expect(await preferFor(login('nobody@x.fr'), undefined)).toBe('code=401');
   });
 
-  it('rejects unknown ids and sub-paths: no example', async () => {
-    expect(await preferFor(get('/rooms/unknown'), undefined)).toBeUndefined();
+  it('rejects unknown ids with a 404', async () => {
+    expect(await preferFor(get('/rooms/unknown'), undefined)).toBe('code=404');
+    expect(await preferFor(get('/reservations/unknown'), undefined)).toBe('code=404');
+  });
+
+  it('leaves sub-paths without example', async () => {
     expect(
       await preferFor(get('/rooms/00000000-0000-4000-8000-100000000003/availability'), undefined),
     ).toBeUndefined();
@@ -120,5 +132,23 @@ describe('emulateList', () => {
   it('rejects non list paths: body untouched', () => {
     const body = { id: 'x' };
     expect(emulateList(new URL('http://m/rooms/x'), body, undefined)).toBe(body);
+  });
+});
+
+describe('mock data matches the contract the sdk validates', () => {
+  it.each([
+    ['rooms', rooms, zRoom],
+    ['users', users, zUser],
+    ['reservations', reservations, zReservation],
+    ['availability', availability, zAvailabilitySlot],
+  ] as const)('%s', (_, items, schema) => {
+    for (const item of items) expect(schema.safeParse(item).error).toBeUndefined();
+  });
+
+  it('rejects a slot with seconds', () => {
+    expect(
+      zAvailabilitySlot.safeParse({ startTime: '08:00:00', endTime: '09:00', available: true })
+        .success,
+    ).toBe(false);
   });
 });

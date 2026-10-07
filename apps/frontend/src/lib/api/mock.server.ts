@@ -46,7 +46,7 @@ export async function preferFor(
   const [, collection, id] = /\/(rooms|users|reservations)\/([^/]+)$/.exec(pathname) ?? [];
   if (request.method !== 'GET' || !collection || !id) return undefined;
   const example = exampleById[collection](id);
-  return example ? `example=${example}` : undefined;
+  return example ? `example=${example}` : 'code=404';
 }
 
 const paginate = <T>(items: T[], params: URLSearchParams) => {

@@ -9,36 +9,35 @@ import { Icon } from '~/components/ui/icon';
 import { Meta, MetaItem } from '~/components/ui/page-header';
 import { formatRate } from '~/lib/format';
 
-export const RoomPhoto = component$<{ room: Room; priority?: boolean; class?: string }>(
-  ({ room, priority, class: className }) => {
-    const tone = [room.status === 'INACTIVE' && 'grayscale', className];
-    return room.imageUrl ? (
-      <Image
-        src={room.imageUrl}
-        alt=""
-        layout="fullWidth"
-        aspectRatio={16 / 9}
-        placeholder="var(--color-action-subtle)"
-        loading={priority ? 'eager' : 'lazy'}
-        fetchpriority={priority ? 'high' : undefined}
-        class={['block', tone]}
+export const RoomPhoto = component$<{ room: Room; hero?: boolean }>(({ room, hero }) => {
+  const frame = [
+    'aspect-video w-full',
+    hero && 'rounded-(--radius-lg) lg:aspect-[21/9]',
+    room.status === 'INACTIVE' && 'grayscale',
+  ];
+  return room.imageUrl ? (
+    <Image
+      src={room.imageUrl}
+      alt=""
+      layout="fullWidth"
+      objectFit="cover"
+      placeholder="var(--color-action-subtle)"
+      loading={hero ? 'eager' : 'lazy'}
+      fetchpriority={hero ? 'high' : undefined}
+      class={['block', frame]}
+    />
+  ) : (
+    <div
+      aria-hidden="true"
+      class={['grid place-items-center bg-(--color-action-subtle) text-(--color-action)', frame]}
+    >
+      <Icon
+        name="building"
+        class="size-10 rounded-(--radius-full) bg-(--color-surface) p-(--space-2) stroke-[1.5]"
       />
-    ) : (
-      <div
-        aria-hidden="true"
-        class={[
-          'grid aspect-video place-items-center bg-(--color-action-subtle) text-(--color-action)',
-          tone,
-        ]}
-      >
-        <Icon
-          name="building"
-          class="size-10 rounded-(--radius-full) bg-(--color-surface) p-(--space-2) stroke-[1.5]"
-        />
-      </div>
-    );
-  },
-);
+    </div>
+  );
+});
 
 export const RoomCard = component$<{ room: Room }>(({ room }) => (
   <article
