@@ -1,30 +1,36 @@
-import { component$, $, useSignal } from '@builder.io/qwik';
-import type { Reservation, User } from '@room-booking/core';
-import type { Meta, StoryObj } from 'storybook-framework-qwik';
-import { Alert } from './alert';
-import { Avatar } from './avatar';
-import { Badge, Count, StatusBadge } from './badge';
-import { Button, ButtonLink } from './button';
-import { ChipList } from './chip-list';
-import { Detail, Details } from './details';
-import { ErrorSummary } from './error-summary';
-import { Checkbox, Field, Input, Select, Textarea, TextField } from './field';
-import { Icon } from './icon';
-import { Modal } from './modal';
-import { Pagination } from './pagination';
-import { BackLink, EmptyState, Meta as PageMeta, MetaItem, PageHeader } from './page-header';
-import { Segmented } from './segmented';
-import { Spinner } from './spinner';
+import { component$, $, useSignal } from "@builder.io/qwik";
+import type { Reservation, User } from "@room-booking/core";
+import type { Meta, StoryObj } from "storybook-framework-qwik";
+import { Alert } from "./alert";
+import { Avatar } from "./avatar";
+import { Badge, Count, StatusBadge } from "./badge";
+import { Button, ButtonLink } from "./button";
+import { ChipList } from "./chip-list";
+import { Detail, Details } from "./details";
+import { ErrorSummary } from "./error-summary";
+import { Checkbox, Field, Input, Select, Textarea, TextField } from "./field";
+import { Icon } from "./icon";
+import { Modal } from "./modal";
+import { Pagination } from "./pagination";
+import {
+  BackLink,
+  EmptyState,
+  Meta as PageMeta,
+  MetaItem,
+  PageHeader,
+} from "./page-header";
+import { Segmented } from "./segmented";
+import { Spinner } from "./spinner";
 
-const user: Pick<User, 'firstName' | 'lastName'> = {
-  firstName: 'Léa',
-  lastName: 'Martin',
+const user: Pick<User, "firstName" | "lastName"> = {
+  firstName: "Léa",
+  lastName: "Martin",
 };
 
 const meta = {
-  title: 'UI kit',
+  title: "UI kit",
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 } satisfies Meta;
 
@@ -79,7 +85,11 @@ export const FormFields: Story = {
   render: () => (
     <div class="flex w-96 flex-col gap-(--space-4)">
       <TextField id="name" label="Nom" value="Salle Quorum" />
-      <Field id="email" label="Adresse e-mail" hint="Utilisée pour les notifications.">
+      <Field
+        id="email"
+        label="Adresse e-mail"
+        hint="Utilisée pour les notifications."
+      >
         <Input id="email" type="email" placeholder="nom@example.com" />
       </Field>
       <Field id="room" label="Salle">
@@ -99,7 +109,10 @@ export const FormFields: Story = {
 export const Navigation: Story = {
   render: () => (
     <div class="flex w-[min(42rem,90vw)] flex-col gap-(--space-5)">
-      <PageHeader title="Mes réservations" description="Retrouvez vos prochaines réservations." />
+      <PageHeader
+        title="Mes réservations"
+        description="Retrouvez vos prochaines réservations."
+      />
       <BackLink href="/" label="Retour à l’accueil" />
       <PageMeta>
         <MetaItem icon="pin">Paris</MetaItem>
@@ -110,7 +123,13 @@ export const Navigation: Story = {
         icon="calendar"
         description="Vos réservations apparaîtront ici."
       />
-      <Pagination page={2} pageSize={10} total={42} query="" noun="réservations" />
+      <Pagination
+        page={2}
+        pageSize={10}
+        total={42}
+        query=""
+        noun="réservations"
+      />
     </div>
   ),
 };
@@ -119,20 +138,22 @@ export const DisclosureAndSegments: Story = {
   render: () => (
     <div class="flex w-96 flex-col gap-(--space-4)">
       <Details>
-        <Detail term="Équipement">Écran, tableau blanc et visioconférence.</Detail>
+        <Detail term="Équipement">
+          Écran, tableau blanc et visioconférence.
+        </Detail>
         <Detail term="Accessibilité">Accès PMR.</Detail>
       </Details>
       <Segmented
         label="Période"
         items={[
-          { href: '?period=upcoming', label: 'À venir', current: true },
-          { href: '?period=past', label: 'Passées', current: false },
+          { href: "?period=upcoming", label: "À venir", current: true },
+          { href: "?period=past", label: "Passées", current: false },
         ]}
       />
       <div class="flex items-center gap-(--space-3)">
         <Spinner />
         <Icon name="check" />
-        <ChipList items={['Écran', 'Wi-Fi', 'Café']} />
+        <ChipList items={["Écran", "Wi-Fi", "Café"]} />
       </div>
     </div>
   ),
@@ -143,8 +164,8 @@ export const Errors: Story = {
     <ErrorSummary
       action="#booking-form"
       errors={[
-        { id: 'name', label: 'Nom', message: 'Le nom est obligatoire.' },
-        { id: 'date', label: 'Date', message: 'Choisissez une date.' },
+        { id: "name", label: "Nom", message: "Le nom est obligatoire." },
+        { id: "date", label: "Date", message: "Choisissez une date." },
       ]}
     />
   ),
@@ -157,7 +178,11 @@ const ModalExample = component$(() => {
       <Button onClick$={() => (open.value = true)}>Ouvrir la modale</Button>
       <Modal open={open} title="Confirmer la réservation">
         <p>Cette action enverra une demande au gestionnaire.</p>
-        <Button q:slot="footer" variant="secondary" onClick$={() => (open.value = false)}>
+        <Button
+          q:slot="footer"
+          variant="secondary"
+          onClick$={() => (open.value = false)}
+        >
           Annuler
         </Button>
         <Button q:slot="footer" onClick$={() => (open.value = false)}>
@@ -175,9 +200,9 @@ export const ModalDialog: Story = {
 export const ReservationStatus: Story = {
   render: () => (
     <div class="flex gap-(--space-3)">
-      <StatusBadge status={'PENDING' as Reservation['status']} />
-      <StatusBadge status={'CONFIRMED' as Reservation['status']} />
-      <StatusBadge status={'REJECTED' as Reservation['status']} />
+      <StatusBadge status={"PENDING" as Reservation["status"]} />
+      <StatusBadge status={"CONFIRMED" as Reservation["status"]} />
+      <StatusBadge status={"REJECTED" as Reservation["status"]} />
     </div>
   ),
 };

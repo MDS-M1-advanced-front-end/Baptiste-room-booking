@@ -1,4 +1,4 @@
-import { component$ } from '@builder.io/qwik';
+import { component$ } from "@builder.io/qwik";
 import {
   Form,
   Link,
@@ -7,24 +7,30 @@ import {
   zod$,
   type DocumentHead,
   type RequestHandler,
-} from '@builder.io/qwik-city';
-import { postAuthLogin } from '@room-booking/core';
-import { AuthCard } from '~/components/layout/auth-card';
-import { Alert } from '~/components/ui/alert';
-import { Button } from '~/components/ui/button';
-import { TextField } from '~/components/ui/field';
-import { api } from '~/lib/api/client.server';
-import { HOME, currentUser } from '~/lib/auth.server';
-import { startSession } from '~/lib/auth-session.server';
-import { loginShape } from '~/lib/schemas';
+} from "@builder.io/qwik-city";
+import { postAuthLogin } from "@room-booking/core";
+import { AuthCard } from "~/components/layout/auth-card";
+import { Alert } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { TextField } from "~/components/ui/field";
+import { api } from "~/lib/api/client.server";
+import { HOME, currentUser } from "~/lib/auth.server";
+import { startSession } from "~/lib/auth-session.server";
+import { loginShape } from "~/lib/schemas";
 
 export const onGet: RequestHandler = (event) => {
   if (currentUser(event)) throw event.redirect(302, HOME);
 };
 
 export const useLogin = routeAction$(async (credentials, event) => {
-  const { data } = await postAuthLogin({ client: api(event), body: credentials });
-  if (!data) return event.fail(401, { message: 'Adresse e-mail ou mot de passe incorrect.' });
+  const { data } = await postAuthLogin({
+    client: api(event),
+    body: credentials,
+  });
+  if (!data)
+    return event.fail(401, {
+      message: "Adresse e-mail ou mot de passe incorrect.",
+    });
   throw startSession(event, data);
 }, zod$(loginShape));
 
@@ -49,7 +55,7 @@ export default component$(() => {
           type="email"
           autoComplete="email"
           required
-          value={login.formData?.get('email')?.toString()}
+          value={login.formData?.get("email")?.toString()}
           error={errors?.email}
         />
         <TextField
@@ -65,10 +71,11 @@ export default component$(() => {
         </Button>
       </Form>
       <span q:slot="switch">
-        Pas encore de compte ? <Link href={`/register/${url.search}`}>Créer un compte</Link>
+        Pas encore de compte ?{" "}
+        <Link href={`/register/${url.search}`}>Créer un compte</Link>
       </span>
     </AuthCard>
   );
 });
 
-export const head: DocumentHead = { title: 'Connexion' };
+export const head: DocumentHead = { title: "Connexion" };

@@ -1,8 +1,8 @@
-import '../src/global.css';
+import "../src/global.css";
 
 const preview = {
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     controls: {
       expanded: true,
     },

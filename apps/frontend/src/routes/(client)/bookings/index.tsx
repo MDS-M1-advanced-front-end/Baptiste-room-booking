@@ -1,4 +1,4 @@
-import { component$, useSignal, useTask$ } from '@builder.io/qwik';
+import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 import {
   Form,
   routeAction$,
@@ -7,39 +7,45 @@ import {
   z,
   zod$,
   type DocumentHead,
-} from '@builder.io/qwik-city';
+} from "@builder.io/qwik-city";
 import {
   deleteReservationsByReservationId,
   getReservations,
   type Reservation,
-} from '@room-booking/core';
-import { ReservationItem, ReservationList } from '~/components/booking/reservation-item';
-import { Alert } from '~/components/ui/alert';
-import { RESERVATION_STATUS_LABELS } from '~/components/ui/badge';
-import { Button, ButtonLink } from '~/components/ui/button';
-import { Icon } from '~/components/ui/icon';
-import { Modal } from '~/components/ui/modal';
-import { EmptyState, PageHeader } from '~/components/ui/page-header';
-import { Segmented } from '~/components/ui/segmented';
-import { api } from '~/lib/api/client.server';
-import { roomsById } from '~/lib/api/rooms.server';
-import { requireUser } from '~/lib/auth.server';
-import { canEdit, slotSentence, splitByTime } from '~/lib/bookings';
-import { reservationError } from '~/lib/reservation-errors';
-import { RESERVATION_STATUSES, parseStatus } from '~/lib/url-params';
+} from "@room-booking/core";
+import {
+  ReservationItem,
+  ReservationList,
+} from "~/components/booking/reservation-item";
+import { Alert } from "~/components/ui/alert";
+import { RESERVATION_STATUS_LABELS } from "~/components/ui/badge";
+import { Button, ButtonLink } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
+import { Modal } from "~/components/ui/modal";
+import { EmptyState, PageHeader } from "~/components/ui/page-header";
+import { Segmented } from "~/components/ui/segmented";
+import { api } from "~/lib/api/client.server";
+import { roomsById } from "~/lib/api/rooms.server";
+import { requireUser } from "~/lib/auth.server";
+import { canEdit, slotSentence, splitByTime } from "~/lib/bookings";
+import { reservationError } from "~/lib/reservation-errors";
+import { RESERVATION_STATUSES, parseStatus } from "~/lib/url-params";
 
 const TAB_LABELS = {
-  PENDING: 'En attente',
-  CONFIRMED: 'Confirmées',
-  COMPLETED: 'Terminées',
-  CANCELLED: 'Annulées',
-  REJECTED: 'Refusées',
+  PENDING: "En attente",
+  CONFIRMED: "Confirmées",
+  COMPLETED: "Terminées",
+  CANCELLED: "Annulées",
+  REJECTED: "Refusées",
 };
 
 export const useBookings = routeLoader$(async (event) => {
-  const status = parseStatus(event.url.searchParams.get('status'));
+  const status = parseStatus(event.url.searchParams.get("status"));
   const client = api(event);
-  const { data } = await getReservations({ client, query: { status, pageSize: 100 } });
+  const { data } = await getReservations({
+    client,
+    query: { status, pageSize: 100 },
+  });
   if (!data) return { status, failed: true as const };
   const rooms = await roomsById(
     client,
@@ -62,7 +68,9 @@ export const useCancelReservation = routeAction$(
       path: { reservationId },
     });
     if (error || !response?.ok) {
-      return event.fail(response?.status ?? 500, { message: reservationError(response?.status) });
+      return event.fail(response?.status ?? 500, {
+        message: reservationError(response?.status),
+      });
     }
     return { cancelled: true };
   },
@@ -74,13 +82,15 @@ export default component$(() => {
   const cancel = useCancelReservation();
   const { url } = useLocation();
   const open = useSignal(false);
-  const selected = useSignal<{ id: string; room: string; when: string } | null>(null);
+  const selected = useSignal<{ id: string; room: string; when: string } | null>(
+    null,
+  );
   useTask$(({ track }) => {
     if (track(() => cancel.value?.cancelled)) open.value = false;
   });
   const value = bookings.value;
   const tabs = [
-    { label: 'Toutes', href: url.pathname, current: !value.status },
+    { label: "Toutes", href: url.pathname, current: !value.status },
     ...RESERVATION_STATUSES.map((status) => ({
       label: TAB_LABELS[status],
       href: `${url.pathname}?status=${status}`,
@@ -89,9 +99,16 @@ export default component$(() => {
   ];
 
   const item = (reservation: Reservation, past: boolean) => {
-    const name = value.failed ? undefined : value.rooms[reservation.roomId]?.name;
+    const name = value.failed
+      ? undefined
+      : value.rooms[reservation.roomId]?.name;
     return (
-      <ReservationItem key={reservation.id} reservation={reservation} roomName={name} past={past}>
+      <ReservationItem
+        key={reservation.id}
+        reservation={reservation}
+        roomName={name}
+        past={past}
+      >
         {!value.failed && canEdit(reservation, new Date(value.now)) && (
           <>
             <ButtonLink
@@ -110,7 +127,7 @@ export default component$(() => {
               onClick$={() => {
                 selected.value = {
                   id: reservation.id,
-                  room: name ?? 'Salle',
+                  room: name ?? "Salle",
                   when: slotSentence(reservation),
                 };
                 open.value = true;
@@ -142,15 +159,20 @@ export default component$(() => {
         </Alert>
       )}
       {value.failed ? (
-        <Alert tone="danger" title="Vos réservations n'ont pas pu être chargées">
-          <p>Le serveur ne répond pas. Rechargez la page dans quelques instants.</p>
+        <Alert
+          tone="danger"
+          title="Vos réservations n'ont pas pu être chargées"
+        >
+          <p>
+            Le serveur ne répond pas. Rechargez la page dans quelques instants.
+          </p>
         </Alert>
       ) : value.upcoming.length + value.past.length === 0 ? (
         <EmptyState
           title={
             value.status
               ? `Aucune réservation « ${RESERVATION_STATUS_LABELS[value.status]} »`
-              : 'Aucune réservation pour le moment'
+              : "Aucune réservation pour le moment"
           }
           icon="calendar"
           description="Trouvez une salle dans le catalogue et choisissez un créneau."
@@ -162,15 +184,25 @@ export default component$(() => {
       ) : (
         <div class="flex flex-col gap-(--space-6)">
           {value.upcoming.length > 0 && (
-            <section aria-labelledby="upcoming-title" class="flex flex-col gap-(--space-4)">
+            <section
+              aria-labelledby="upcoming-title"
+              class="flex flex-col gap-(--space-4)"
+            >
               <h2 id="upcoming-title">À venir</h2>
-              <ReservationList>{value.upcoming.map((r) => item(r, false))}</ReservationList>
+              <ReservationList>
+                {value.upcoming.map((r) => item(r, false))}
+              </ReservationList>
             </section>
           )}
           {value.past.length > 0 && (
-            <section aria-labelledby="past-title" class="flex flex-col gap-(--space-4)">
+            <section
+              aria-labelledby="past-title"
+              class="flex flex-col gap-(--space-4)"
+            >
               <h2 id="past-title">Passées, refusées ou annulées</h2>
-              <ReservationList>{value.past.map((r) => item(r, true))}</ReservationList>
+              <ReservationList>
+                {value.past.map((r) => item(r, true))}
+              </ReservationList>
             </section>
           )}
         </div>
@@ -180,18 +212,27 @@ export default component$(() => {
           <strong>{selected.value?.room}</strong>, {selected.value?.when}.
         </p>
         <p class="text-(--color-text-muted)">
-          Le créneau sera libéré pour d'autres personnes. Cette action est définitive.
+          Le créneau sera libéré pour d'autres personnes. Cette action est
+          définitive.
         </p>
         {cancel.value?.failed && (
           <Alert tone="danger" title="Annulation impossible">
             <p>{cancel.value.message}</p>
           </Alert>
         )}
-        <Button q:slot="footer" variant="secondary" onClick$={() => (open.value = false)}>
+        <Button
+          q:slot="footer"
+          variant="secondary"
+          onClick$={() => (open.value = false)}
+        >
           Conserver
         </Button>
         <Form q:slot="footer" action={cancel} class="contents">
-          <input type="hidden" name="reservationId" value={selected.value?.id} />
+          <input
+            type="hidden"
+            name="reservationId"
+            value={selected.value?.id}
+          />
           <Button type="submit" variant="danger" busy={cancel.isRunning}>
             Annuler la réservation
           </Button>
@@ -201,4 +242,4 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = { title: 'Mes réservations' };
+export const head: DocumentHead = { title: "Mes réservations" };

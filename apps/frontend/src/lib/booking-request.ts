@@ -1,4 +1,4 @@
-import { parisIso } from './dates';
+import { parisIso } from "./dates";
 
 interface BookingInput {
   date: string;
@@ -16,4 +16,6 @@ export const reservationTimes = (input: BookingInput) => ({
 });
 
 export const capacityError = (capacity: number, participants: number) =>
-  participants > capacity ? `La salle accueille ${capacity} personnes au maximum.` : undefined;
+  participants > capacity
+    ? `La salle accueille ${capacity} personnes au maximum.`
+    : undefined;

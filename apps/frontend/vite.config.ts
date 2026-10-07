@@ -1,10 +1,9 @@
-import { defineConfig, type UserConfig } from 'vite';
-import { qwikVite } from '@builder.io/qwik/optimizer';
-import { qwikCity } from '@builder.io/qwik-city/vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import tailwindcss from '@tailwindcss/vite';
-import pkg from './package.json';
-
+import { defineConfig, type UserConfig } from "vite";
+import { qwikVite } from "@builder.io/qwik/optimizer";
+import { qwikCity } from "@builder.io/qwik-city/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
+import pkg from "./package.json";
 type PkgDep = Record<string, string>;
 const { dependencies = {}, devDependencies = {} } = pkg as any as {
   dependencies: PkgDep;
@@ -14,21 +13,31 @@ const { dependencies = {}, devDependencies = {} } = pkg as any as {
 errorOnDuplicatesPkgDeps(devDependencies, dependencies);
 
 export default defineConfig((): UserConfig => ({
-  plugins: [qwikCity(), qwikVite(), tsconfigPaths({ root: '.' }), tailwindcss()],
-  ssr: { noExternal: ['@room-booking/core'] },
+  plugins: [
+    qwikCity(),
+    qwikVite(),
+    tsconfigPaths({ root: "." }),
+    tailwindcss(),
+  ],
+  ssr: { noExternal: ["@room-booking/core"] },
 }));
-
-function errorOnDuplicatesPkgDeps(devDependencies: PkgDep, dependencies: PkgDep) {
-  let msg = '';
-  const duplicateDeps = Object.keys(devDependencies).filter((dep) => dependencies[dep]);
-  const qwikPkg = Object.keys(dependencies).filter((value) => /qwik/i.test(value));
-  msg = `Move qwik packages ${qwikPkg.join(', ')} to devDependencies`;
-
+function errorOnDuplicatesPkgDeps(
+  devDependencies: PkgDep,
+  dependencies: PkgDep,
+) {
+  let msg = "";
+  const duplicateDeps = Object.keys(devDependencies).filter(
+    (dep) => dependencies[dep],
+  );
+  const qwikPkg = Object.keys(dependencies).filter((value) =>
+    /qwik/i.test(value),
+  );
+  msg = `Move qwik packages ${qwikPkg.join(", ")} to devDependencies`;
   if (qwikPkg.length > 0) {
     throw new Error(msg);
   }
   msg = `
-    Warning: The dependency "${duplicateDeps.join(', ')}" is listed in both "devDependencies" and "dependencies".
+    Warning: The dependency "${duplicateDeps.join(", ")}" is listed in both "devDependencies" and "dependencies".
     Please move the duplicated dependencies to "devDependencies" only and remove it from "dependencies"
   `;
   if (duplicateDeps.length > 0) {

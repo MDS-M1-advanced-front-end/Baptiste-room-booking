@@ -1,5 +1,5 @@
-import { component$ } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
+import { component$ } from "@builder.io/qwik";
+import { Link } from "@builder.io/qwik-city";
 
 export interface SegmentedItem {
   label: string;
@@ -15,7 +15,7 @@ export const Segmented = component$<{ items: SegmentedItem[]; label: string }>(
           <li key={item.href}>
             <Link
               href={item.href}
-              aria-current={item.current ? 'page' : undefined}
+              aria-current={item.current ? "page" : undefined}
               class="inline-flex min-h-(--size-control-sm) items-center gap-(--space-2) rounded-(--radius-sm) px-(--space-3) text-(length:--font-size-sm) font-(--font-weight-semibold) whitespace-nowrap text-(--color-text) no-underline aria-[current=page]:bg-(--color-surface) aria-[current=page]:text-(--color-action) aria-[current=page]:shadow-(--shadow-sm)"
             >
               {item.label}

@@ -1,4 +1,4 @@
-import { component$, useSignal, useTask$ } from '@builder.io/qwik';
+import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 import {
   Form,
   routeAction$,
@@ -7,32 +7,39 @@ import {
   zod$,
   type DocumentHead,
   type RequestEventAction,
-} from '@builder.io/qwik-city';
+} from "@builder.io/qwik-city";
 import {
   getReservations,
   postReservationsByReservationIdConfirm,
   postReservationsByReservationIdReject,
   type Reservation,
   type User,
-} from '@room-booking/core';
-import { ReservationItem, ReservationList } from '~/components/booking/reservation-item';
-import { Alert } from '~/components/ui/alert';
-import { Count } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import { Field, Textarea, fieldA11y } from '~/components/ui/field';
-import { Icon } from '~/components/ui/icon';
-import { Modal } from '~/components/ui/modal';
-import { EmptyState, PageHeader } from '~/components/ui/page-header';
-import { api } from '~/lib/api/client.server';
-import { managedReservation, roomsById, usersById } from '~/lib/api/rooms.server';
-import { requireRole } from '~/lib/auth.server';
-import { slotSentence, splitRequests } from '~/lib/bookings';
-import { formatParis } from '~/lib/format';
-import { MANAGER_ROLES } from '~/lib/navigation';
-import { reservationError } from '~/lib/reservation-errors';
+} from "@room-booking/core";
+import {
+  ReservationItem,
+  ReservationList,
+} from "~/components/booking/reservation-item";
+import { Alert } from "~/components/ui/alert";
+import { Count } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Field, Textarea, fieldA11y } from "~/components/ui/field";
+import { Icon } from "~/components/ui/icon";
+import { Modal } from "~/components/ui/modal";
+import { EmptyState, PageHeader } from "~/components/ui/page-header";
+import { api } from "~/lib/api/client.server";
+import {
+  managedReservation,
+  roomsById,
+  usersById,
+} from "~/lib/api/rooms.server";
+import { requireRole } from "~/lib/auth.server";
+import { slotSentence, splitRequests } from "~/lib/bookings";
+import { formatParis } from "~/lib/format";
+import { MANAGER_ROLES } from "~/lib/navigation";
+import { reservationError } from "~/lib/reservation-errors";
 
-const fullName = (user?: Pick<User, 'firstName' | 'lastName'>) =>
-  user ? `${user.firstName} ${user.lastName}` : 'un utilisateur inconnu';
+const fullName = (user?: Pick<User, "firstName" | "lastName">) =>
+  user ? `${user.firstName} ${user.lastName}` : "un utilisateur inconnu";
 
 export const useRequests = routeLoader$(async (event) => {
   requireRole(event, MANAGER_ROLES);
@@ -49,11 +56,13 @@ export const useRequests = routeLoader$(async (event) => {
       data.items.map((item) => item.userId),
     ),
   ]);
-  const names = Object.fromEntries(Object.values(users).map((user) => [user.id, fullName(user)]));
+  const names = Object.fromEntries(
+    Object.values(users).map((user) => [user.id, fullName(user)]),
+  );
   return { ...splitRequests(data.items), rooms, names };
 });
 
-type Decision = 'confirm' | 'reject';
+type Decision = "confirm" | "reject";
 
 async function decide(
   event: RequestEventAction,
@@ -63,12 +72,14 @@ async function decide(
 ) {
   const target = await managedReservation(event, reservationId);
   if (target.status !== 200) {
-    return event.fail(target.status, { message: reservationError(target.status) });
+    return event.fail(target.status, {
+      message: reservationError(target.status),
+    });
   }
   const client = api(event);
   const path = { reservationId };
   const { error, response } =
-    decision === 'confirm'
+    decision === "confirm"
       ? await postReservationsByReservationIdConfirm({ client, path })
       : await postReservationsByReservationIdReject({
           client,
@@ -78,25 +89,29 @@ async function decide(
   if (error || !response?.ok) {
     const status = response?.status ?? 500;
     return event.fail(status, {
-      message: status === 409 ? 'Cette demande a déjà été traitée.' : reservationError(status),
+      message:
+        status === 409
+          ? "Cette demande a déjà été traitée."
+          : reservationError(status),
     });
   }
   const { reservation, room, requester } = target;
-  const verb = decision === 'confirm' ? 'confirmée' : 'refusée';
+  const verb = decision === "confirm" ? "confirmée" : "refusée";
   return {
-    decided: `Réservation de ${fullName(requester)} ${verb} (${room.name}, ${formatParis(reservation.startAt, 'date')}).`,
+    decided: `Réservation de ${fullName(requester)} ${verb} (${room.name}, ${formatParis(reservation.startAt, "date")}).`,
   };
 }
 
 const reservationId = z.string().uuid();
 
 export const useConfirm = routeAction$(
-  ({ reservationId }, event) => decide(event, 'confirm', reservationId),
+  ({ reservationId }, event) => decide(event, "confirm", reservationId),
   zod$({ reservationId }),
 );
 
 export const useReject = routeAction$(
-  ({ reservationId, reason }, event) => decide(event, 'reject', reservationId, reason?.trim()),
+  ({ reservationId, reason }, event) =>
+    decide(event, "reject", reservationId, reason?.trim()),
   zod$({ reservationId, reason: z.string().max(500).optional() }),
 );
 
@@ -116,14 +131,22 @@ export default component$(() => {
     const room = value?.rooms[reservation.roomId]?.name;
     const requester = value?.names[reservation.userId] ?? fullName();
     return (
-      <ReservationItem key={reservation.id} reservation={reservation} roomName={room}>
+      <ReservationItem
+        key={reservation.id}
+        reservation={reservation}
+        roomName={room}
+      >
         <p class="text-(length:--font-size-sm)">
           Demande de <strong>{requester}</strong>
         </p>
         {pending && (
           <>
             <Form q:slot="actions" action={confirm} class="contents">
-              <input type="hidden" name="reservationId" value={reservation.id} />
+              <input
+                type="hidden"
+                name="reservationId"
+                value={reservation.id}
+              />
               <Button type="submit" size="sm">
                 <Icon name="check" />
                 Confirmer
@@ -136,7 +159,7 @@ export default component$(() => {
               onClick$={() => {
                 selected.value = {
                   id: reservation.id,
-                  summary: `${room ?? 'Salle'}, ${slotSentence(reservation)}, pour ${requester}.`,
+                  summary: `${room ?? "Salle"}, ${slotSentence(reservation)}, pour ${requester}.`,
                 };
                 open.value = true;
               }}
@@ -168,7 +191,9 @@ export default component$(() => {
       )}
       {!value ? (
         <Alert tone="danger" title="Les demandes n'ont pas pu être chargées">
-          <p>Le serveur ne répond pas. Rechargez la page dans quelques instants.</p>
+          <p>
+            Le serveur ne répond pas. Rechargez la page dans quelques instants.
+          </p>
         </Alert>
       ) : value.pending.length + value.handled.length === 0 ? (
         <EmptyState
@@ -178,20 +203,32 @@ export default component$(() => {
         />
       ) : (
         <div class="flex flex-col gap-(--space-6)">
-          <section aria-labelledby="pending-title" class="flex flex-col gap-(--space-4)">
+          <section
+            aria-labelledby="pending-title"
+            class="flex flex-col gap-(--space-4)"
+          >
             <h2 id="pending-title" class="flex items-center gap-(--space-2)">
               En attente <Count value={value.pending.length} />
             </h2>
             {value.pending.length > 0 ? (
-              <ReservationList>{value.pending.map((r) => item(r, true))}</ReservationList>
+              <ReservationList>
+                {value.pending.map((r) => item(r, true))}
+              </ReservationList>
             ) : (
-              <p class="text-(--color-text-muted)">Aucune demande en attente.</p>
+              <p class="text-(--color-text-muted)">
+                Aucune demande en attente.
+              </p>
             )}
           </section>
           {value.handled.length > 0 && (
-            <section aria-labelledby="handled-title" class="flex flex-col gap-(--space-4)">
+            <section
+              aria-labelledby="handled-title"
+              class="flex flex-col gap-(--space-4)"
+            >
               <h2 id="handled-title">Traitées récemment</h2>
-              <ReservationList>{value.handled.map((r) => item(r, false))}</ReservationList>
+              <ReservationList>
+                {value.handled.map((r) => item(r, false))}
+              </ReservationList>
             </section>
           )}
         </div>
@@ -199,9 +236,20 @@ export default component$(() => {
       <Modal open={open} title="Refuser la demande ?">
         <p>{selected.value?.summary}</p>
         <Form id="reject-form" action={reject} class="contents">
-          <input type="hidden" name="reservationId" value={selected.value?.id} />
-          <Field id="reason" label="Motif (facultatif)" hint="Envoyé avec le refus.">
-            <Textarea {...fieldA11y({ id: 'reason', hint: 'Envoyé avec le refus.' })} rows={3} />
+          <input
+            type="hidden"
+            name="reservationId"
+            value={selected.value?.id}
+          />
+          <Field
+            id="reason"
+            label="Motif (facultatif)"
+            hint="Envoyé avec le refus."
+          >
+            <Textarea
+              {...fieldA11y({ id: "reason", hint: "Envoyé avec le refus." })}
+              rows={3}
+            />
           </Field>
         </Form>
         {reject.value?.failed && (
@@ -209,7 +257,11 @@ export default component$(() => {
             <p>{reject.value.message}</p>
           </Alert>
         )}
-        <Button q:slot="footer" variant="secondary" onClick$={() => (open.value = false)}>
+        <Button
+          q:slot="footer"
+          variant="secondary"
+          onClick$={() => (open.value = false)}
+        >
           Conserver la demande
         </Button>
         <Button
@@ -226,4 +278,4 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = { title: 'Demandes de réservation' };
+export const head: DocumentHead = { title: "Demandes de réservation" };

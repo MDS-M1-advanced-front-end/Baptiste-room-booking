@@ -1,14 +1,14 @@
-import { component$, type Signal } from '@builder.io/qwik';
-import type { AvailabilitySlot } from '@room-booking/core';
-import { Field, Textarea, TextField, fieldA11y } from '~/components/ui/field';
-import { COMMENT_MAX } from '~/lib/schemas';
-import type { SlotRange } from '~/lib/slots';
+import { component$, type Signal } from "@builder.io/qwik";
+import type { AvailabilitySlot } from "@room-booking/core";
+import { Field, Textarea, TextField, fieldA11y } from "~/components/ui/field";
+import { COMMENT_MAX } from "~/lib/schemas";
+import type { SlotRange } from "~/lib/slots";
 
 export const BOOKING_FIELDS = {
-  numberOfParticipants: 'Nombre de participants',
-  comment: 'Commentaire',
-  startTime: 'Créneau',
-  endTime: 'Créneau',
+  numberOfParticipants: "Nombre de participants",
+  comment: "Commentaire",
+  startTime: "Créneau",
+  endTime: "Créneau",
 };
 
 export const BookingFields = component$<{
@@ -24,8 +24,16 @@ export const BookingFields = component$<{
   return (
     <>
       <input type="hidden" name="date" value={day} />
-      <input type="hidden" name="startTime" value={range ? slots[range.start].startTime : ''} />
-      <input type="hidden" name="endTime" value={range ? slots[range.end].endTime : ''} />
+      <input
+        type="hidden"
+        name="startTime"
+        value={range ? slots[range.start].startTime : ""}
+      />
+      <input
+        type="hidden"
+        name="endTime"
+        value={range ? slots[range.end].endTime : ""}
+      />
       <TextField
         id="numberOfParticipants"
         label={BOOKING_FIELDS.numberOfParticipants}
@@ -38,9 +46,18 @@ export const BookingFields = component$<{
         value={participants}
         error={errors?.numberOfParticipants}
       />
-      <Field id="comment" label={BOOKING_FIELDS.comment} hint="Facultatif" error={errors?.comment}>
+      <Field
+        id="comment"
+        label={BOOKING_FIELDS.comment}
+        hint="Facultatif"
+        error={errors?.comment}
+      >
         <Textarea
-          {...fieldA11y({ id: 'comment', hint: 'Facultatif', error: errors?.comment })}
+          {...fieldA11y({
+            id: "comment",
+            hint: "Facultatif",
+            error: errors?.comment,
+          })}
           rows={3}
           maxLength={COMMENT_MAX}
           value={comment}

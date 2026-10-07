@@ -1,12 +1,20 @@
-import { component$, Slot } from '@builder.io/qwik';
-import { routeAction$, routeLoader$, type RequestHandler } from '@builder.io/qwik-city';
-import { getAuthMe, getReservations } from '@room-booking/core';
-import { CONTAINER, SiteFooter, SiteHeader } from '~/components/layout/site-header';
-import { api } from '~/lib/api/client.server';
-import { HOME, USER_KEY, currentUser } from '~/lib/auth.server';
-import { useRoomImages } from '~/lib/image';
-import { isManager } from '~/lib/navigation';
-import { clearToken, readToken } from '~/lib/session.server';
+import { component$, Slot } from "@builder.io/qwik";
+import {
+  routeAction$,
+  routeLoader$,
+  type RequestHandler,
+} from "@builder.io/qwik-city";
+import { getAuthMe, getReservations } from "@room-booking/core";
+import {
+  CONTAINER,
+  SiteFooter,
+  SiteHeader,
+} from "~/components/layout/site-header";
+import { api } from "~/lib/api/client.server";
+import { HOME, USER_KEY, currentUser } from "~/lib/auth.server";
+import { useRoomImages } from "~/lib/image";
+import { isManager } from "~/lib/navigation";
+import { clearToken, readToken } from "~/lib/session.server";
 
 export const onRequest: RequestHandler = async (event) => {
   event.cacheControl({ noCache: true, private: true });
@@ -16,13 +24,15 @@ export const onRequest: RequestHandler = async (event) => {
   else clearToken(event.cookie);
 };
 
-export const useCurrentUser = routeLoader$((event) => currentUser(event) ?? null);
+export const useCurrentUser = routeLoader$(
+  (event) => currentUser(event) ?? null,
+);
 
 export const usePendingCount = routeLoader$(async (event) => {
   if (!isManager(currentUser(event))) return 0;
   const { data } = await getReservations({
     client: api(event),
-    query: { status: 'PENDING', pageSize: 1 },
+    query: { status: "PENDING", pageSize: 1 },
   });
   return data?.total ?? 0;
 });
@@ -45,8 +55,12 @@ export default component$(() => {
       >
         Aller au contenu
       </a>
-      <SiteHeader user={user.value} pendingCount={pendingCount.value} logout={logout} />
-      <main id="main" class={[CONTAINER, 'pt-(--space-5) pb-(--space-10)']}>
+      <SiteHeader
+        user={user.value}
+        pendingCount={pendingCount.value}
+        logout={logout}
+      />
+      <main id="main" class={[CONTAINER, "pt-(--space-5) pb-(--space-10)"]}>
         <Slot />
       </main>
       <SiteFooter />

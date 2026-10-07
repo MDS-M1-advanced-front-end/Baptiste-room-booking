@@ -1,5 +1,5 @@
-import { component$ } from '@builder.io/qwik';
-import { Alert } from './alert';
+import { component$ } from "@builder.io/qwik";
+import { Alert } from "./alert";
 
 export interface FieldErrorItem {
   id: string;
@@ -7,25 +7,27 @@ export interface FieldErrorItem {
   message: string;
 }
 
-export const ErrorSummary = component$<{ errors: FieldErrorItem[]; action: string }>(
-  ({ errors, action }) =>
-    errors.length ? (
-      <Alert
-        tone="danger"
-        id="error-summary"
-        title={`${errors.length} erreur${errors.length > 1 ? 's empêchent' : ' empêche'} ${action}`}
-      >
-        <ul class="mt-(--space-1) list-disc pl-(--space-4)">
-          {errors.map((error) => (
-            <li key={error.id}>
-              <a href={`#${error.id}`}>
-                {error.label} : {error.message}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Alert>
-    ) : null,
+export const ErrorSummary = component$<{
+  errors: FieldErrorItem[];
+  action: string;
+}>(({ errors, action }) =>
+  errors.length ? (
+    <Alert
+      tone="danger"
+      id="error-summary"
+      title={`${errors.length} erreur${errors.length > 1 ? "s empêchent" : " empêche"} ${action}`}
+    >
+      <ul class="mt-(--space-1) list-disc pl-(--space-4)">
+        {errors.map((error) => (
+          <li key={error.id}>
+            <a href={`#${error.id}`}>
+              {error.label} : {error.message}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Alert>
+  ) : null,
 );
 
 export const collectErrors = (

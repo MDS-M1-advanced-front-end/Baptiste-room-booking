@@ -1,14 +1,14 @@
-import type { RequestEventBase } from '@builder.io/qwik-city';
-import type { User, UserRole } from '@room-booking/core';
+import type { RequestEventBase } from "@builder.io/qwik-city";
+import type { User, UserRole } from "@room-booking/core";
 
-export const USER_KEY = 'user';
-export const HOME = '/rooms/';
+export const USER_KEY = "user";
+export const HOME = "/rooms/";
 
-type GuardEvent = Pick<RequestEventBase, 'sharedMap' | 'url'> & {
+type GuardEvent = Pick<RequestEventBase, "sharedMap" | "url"> & {
   redirect: (status: 302, url: string) => unknown;
 };
 
-export const currentUser = (event: Pick<RequestEventBase, 'sharedMap'>) =>
+export const currentUser = (event: Pick<RequestEventBase, "sharedMap">) =>
   event.sharedMap.get(USER_KEY) as User | undefined;
 
 export function requireUser(event: GuardEvent): User {

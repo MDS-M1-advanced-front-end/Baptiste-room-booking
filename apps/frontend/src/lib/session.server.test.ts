@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import type { Cookie, CookieOptions } from '@builder.io/qwik-city';
-import { SESSION_COOKIE, clearToken, readToken, saveToken } from './session.server';
+import { describe, expect, it } from "vitest";
+import type { Cookie, CookieOptions } from "@builder.io/qwik-city";
+import {
+  SESSION_COOKIE,
+  clearToken,
+  readToken,
+  saveToken,
+} from "./session.server";
 
 function fakeCookie() {
   const store = new Map<string, { value: string; options?: CookieOptions }>();
@@ -13,28 +18,28 @@ function fakeCookie() {
   return { cookie, store };
 }
 
-describe('session cookie', () => {
-  it('saves the token as an httpOnly lax cookie on the whole site', () => {
+describe("session cookie", () => {
+  it("saves the token as an httpOnly lax cookie on the whole site", () => {
     const { cookie, store } = fakeCookie();
-    saveToken(cookie, 'jwt', 3600, true);
-    expect(readToken(cookie)).toBe('jwt');
+    saveToken(cookie, "jwt", 3600, true);
+    expect(readToken(cookie)).toBe("jwt");
     expect(store.get(SESSION_COOKIE)?.options).toMatchObject({
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: "lax",
       secure: true,
-      path: '/',
+      path: "/",
       maxAge: 3600,
     });
   });
 
-  it('rejects a cleared session: no token', () => {
+  it("rejects a cleared session: no token", () => {
     const { cookie } = fakeCookie();
-    saveToken(cookie, 'jwt', 3600, false);
+    saveToken(cookie, "jwt", 3600, false);
     clearToken(cookie);
     expect(readToken(cookie)).toBeUndefined();
   });
 
-  it('rejects an empty cookie jar: no token', () => {
+  it("rejects an empty cookie jar: no token", () => {
     expect(readToken(fakeCookie().cookie)).toBeUndefined();
   });
 });

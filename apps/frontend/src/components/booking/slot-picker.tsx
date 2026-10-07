@@ -1,19 +1,19 @@
-import { component$, useId, type Signal } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
-import type { AvailabilitySlot } from '@room-booking/core';
-import { Alert } from '~/components/ui/alert';
-import { buttonClass } from '~/components/ui/button';
-import { CARD, CARD_BODY } from '~/components/ui/card';
-import { controlClass } from '~/components/ui/field';
-import { Icon } from '~/components/ui/icon';
-import { addDays } from '~/lib/dates';
-import { formatDay, formatHours, formatTime } from '~/lib/format';
-import { rangeMinutes, selectSlot, type SlotRange } from '~/lib/slots';
+import { component$, useId, type Signal } from "@builder.io/qwik";
+import { Link } from "@builder.io/qwik-city";
+import type { AvailabilitySlot } from "@room-booking/core";
+import { Alert } from "~/components/ui/alert";
+import { buttonClass } from "~/components/ui/button";
+import { CARD, CARD_BODY } from "~/components/ui/card";
+import { controlClass } from "~/components/ui/field";
+import { Icon } from "~/components/ui/icon";
+import { addDays } from "~/lib/dates";
+import { formatDay, formatHours, formatTime } from "~/lib/format";
+import { rangeMinutes, selectSlot, type SlotRange } from "~/lib/slots";
 
-const navClass = buttonClass({ variant: 'secondary', size: 'icon' });
+const navClass = buttonClass({ variant: "secondary", size: "icon" });
 
 export const DayNav = component$<{ day: string; min: string; label?: string }>(
-  ({ day, min, label = 'Date' }) => (
+  ({ day, min, label = "Date" }) => (
     <form method="get" class="flex flex-col gap-(--space-1)">
       <label for="slot-date" class="font-(--font-weight-semibold)">
         {label}
@@ -37,7 +37,7 @@ export const DayNav = component$<{ day: string; min: string; label?: string }>(
           min={min}
           value={day}
           required
-          class={[controlClass, 'flex-1']}
+          class={[controlClass, "flex-1"]}
           onChange$={(_, input) => input.form?.requestSubmit()}
         />
         <Link href={`?date=${addDays(day, 1)}`} class={navClass}>
@@ -50,18 +50,21 @@ export const DayNav = component$<{ day: string; min: string; label?: string }>(
 );
 
 const slotClass = [
-  'flex min-h-(--size-control) cursor-pointer flex-col items-center justify-center rounded-(--radius-md) border border-(--color-border-strong) bg-(--color-surface) px-(--space-2) py-(--space-1) font-(--font-weight-semibold) text-(--color-text) tabular-nums',
-  'hover:border-(--color-action) hover:bg-(--color-action-subtle)',
-  'aria-pressed:border-(--color-action) aria-pressed:bg-(--color-action) aria-pressed:text-(--color-on-action) aria-pressed:[&_small]:text-(--color-on-action)',
-  'aria-disabled:cursor-not-allowed aria-disabled:border-dashed aria-disabled:border-(--color-border) aria-disabled:bg-(--color-surface-muted) aria-disabled:text-(--color-text-muted) aria-disabled:line-through',
+  "flex min-h-(--size-control) cursor-pointer flex-col items-center justify-center rounded-(--radius-md) border border-(--color-border-strong) bg-(--color-surface) px-(--space-2) py-(--space-1) font-(--font-weight-semibold) text-(--color-text) tabular-nums",
+  "hover:border-(--color-action) hover:bg-(--color-action-subtle)",
+  "aria-pressed:border-(--color-action) aria-pressed:bg-(--color-action) aria-pressed:text-(--color-on-action) aria-pressed:[&_small]:text-(--color-on-action)",
+  "aria-disabled:cursor-not-allowed aria-disabled:border-dashed aria-disabled:border-(--color-border) aria-disabled:bg-(--color-surface-muted) aria-disabled:text-(--color-text-muted) aria-disabled:line-through",
 ];
 
-const swatchClass = 'size-4 rounded-(--radius-sm) border';
+const swatchClass = "size-4 rounded-(--radius-sm) border";
 
-export const selectionLabel = (slots: AvailabilitySlot[], range: SlotRange | null) =>
+export const selectionLabel = (
+  slots: AvailabilitySlot[],
+  range: SlotRange | null,
+) =>
   range
     ? `Sélection : de ${formatTime(slots[range.start].startTime)} à ${formatTime(slots[range.end].endTime)} (${formatHours(rangeMinutes(slots, range))})`
-    : 'Aucun créneau sélectionné.';
+    : "Aucun créneau sélectionné.";
 
 export const SlotPicker = component$<{
   day: string;
@@ -70,7 +73,9 @@ export const SlotPicker = component$<{
 }>(({ day, slots, selection }) => {
   const labelId = useId();
   if (slots.length === 0) {
-    return <p class="text-(--color-text-muted)">Aucun créneau ouvert ce jour.</p>;
+    return (
+      <p class="text-(--color-text-muted)">Aucun créneau ouvert ce jour.</p>
+    );
   }
   return (
     <div class="flex flex-col gap-(--space-4)">
@@ -85,31 +90,41 @@ export const SlotPicker = component$<{
           onKeyDown$={(event, group) => {
             const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
             if (!step) return;
-            const buttons = Array.from(group.querySelectorAll('button'));
-            buttons[buttons.indexOf(document.activeElement as HTMLButtonElement) + step]?.focus();
+            const buttons = Array.from(group.querySelectorAll("button"));
+            buttons[
+              buttons.indexOf(document.activeElement as HTMLButtonElement) +
+                step
+            ]?.focus();
           }}
         >
           {slots.map((slot, index) => {
             const selected =
-              !!selection.value && index >= selection.value.start && index <= selection.value.end;
+              !!selection.value &&
+              index >= selection.value.start &&
+              index <= selection.value.end;
             return (
               <button
                 key={slot.startTime}
                 type="button"
                 class={slotClass}
-                aria-disabled={slot.available ? undefined : 'true'}
+                aria-disabled={slot.available ? undefined : "true"}
                 aria-pressed={slot.available ? selected : undefined}
-                onClick$={() => (selection.value = selectSlot(slots, selection.value, index))}
+                onClick$={() =>
+                  (selection.value = selectSlot(slots, selection.value, index))
+                }
               >
                 {formatTime(slot.startTime)}
                 <small class="text-(length:--font-size-xs) font-(--font-weight-regular) text-(--color-text-muted)">
-                  {slot.available ? `à ${formatTime(slot.endTime)}` : 'Réservé'}
+                  {slot.available ? `à ${formatTime(slot.endTime)}` : "Réservé"}
                 </small>
               </button>
             );
           })}
         </div>
-        <p role="status" class="text-(length:--font-size-sm) font-(--font-weight-bold)">
+        <p
+          role="status"
+          class="text-(length:--font-size-sm) font-(--font-weight-bold)"
+        >
           {selectionLabel(slots, selection.value)}
         </p>
       </div>
@@ -118,18 +133,25 @@ export const SlotPicker = component$<{
         class="flex flex-wrap gap-x-(--space-4) gap-y-(--space-2) text-(length:--font-size-sm) text-(--color-text-muted)"
       >
         <li class="inline-flex items-center gap-(--space-2)">
-          <span class={[swatchClass, 'border-(--color-border-strong) bg-(--color-surface)']} />
+          <span
+            class={[
+              swatchClass,
+              "border-(--color-border-strong) bg-(--color-surface)",
+            ]}
+          />
           Libre
         </li>
         <li class="inline-flex items-center gap-(--space-2)">
-          <span class={[swatchClass, 'border-(--color-action) bg-(--color-action)']} />
+          <span
+            class={[swatchClass, "border-(--color-action) bg-(--color-action)"]}
+          />
           Sélectionné
         </li>
         <li class="inline-flex items-center gap-(--space-2)">
           <span
             class={[
               swatchClass,
-              'border-dashed border-(--color-border-strong) bg-(--color-surface-muted)',
+              "border-dashed border-(--color-border-strong) bg-(--color-surface-muted)",
             ]}
           />
           Indisponible
@@ -149,14 +171,16 @@ export const SlotCard = component$<{
   const titleId = useId();
   return (
     <section aria-labelledby={titleId} class={CARD}>
-      <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
+      <div class={[CARD_BODY, "flex flex-col gap-(--space-4)"]}>
         <h2 id={titleId}>{title}</h2>
         <DayNav day={day} min={today} />
         {slots ? (
           <SlotPicker day={day} slots={slots} selection={selection} />
         ) : (
           <Alert tone="danger" title="Les créneaux n'ont pas pu être chargés">
-            <p>Le serveur ne répond pas. Choisissez une autre date ou réessayez.</p>
+            <p>
+              Le serveur ne répond pas. Choisissez une autre date ou réessayez.
+            </p>
           </Alert>
         )}
       </div>

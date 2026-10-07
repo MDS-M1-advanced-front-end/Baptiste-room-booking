@@ -1,5 +1,5 @@
-import { component$, Slot } from '@builder.io/qwik';
-import { CARD } from '~/components/ui/card';
+import { component$, Slot } from "@builder.io/qwik";
+import { CARD } from "~/components/ui/card";
 
 export const AuthCard = component$<{ title: string }>(({ title }) => (
   <div class="mx-auto flex max-w-(--size-container-narrow) flex-col gap-(--space-4) md:pt-(--space-6)">

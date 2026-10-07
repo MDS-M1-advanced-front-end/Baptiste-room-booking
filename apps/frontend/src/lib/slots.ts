@@ -1,4 +1,4 @@
-import type { AvailabilitySlot } from '@room-booking/core';
+import type { AvailabilitySlot } from "@room-booking/core";
 
 export interface SlotRange {
   start: number;
@@ -16,13 +16,17 @@ export function selectSlot(
   if (!slots[index]?.available) return current;
   if (current && index > current.end && allAvailable(slots, current.end, index))
     return { start: current.start, end: index };
-  if (current && index < current.start && allAvailable(slots, index, current.start))
+  if (
+    current &&
+    index < current.start &&
+    allAvailable(slots, index, current.start)
+  )
     return { start: index, end: current.end };
   return { start: index, end: index };
 }
 
 const minutes = (time: string) => {
-  const [hours, mins] = time.split(':').map(Number);
+  const [hours, mins] = time.split(":").map(Number);
   return hours * 60 + mins;
 };
 
@@ -35,19 +39,29 @@ export function rangeMinutes(slots: AvailabilitySlot[], range: SlotRange) {
 export const estimatePrice = (pricePerHour: number, mins: number) =>
   Math.round(((pricePerHour * mins) / 60) * 100) / 100;
 
-export const withOwnSlots = (slots: AvailabilitySlot[], start: string, end: string) =>
+export const withOwnSlots = (
+  slots: AvailabilitySlot[],
+  start: string,
+  end: string,
+) =>
   slots.map((slot) =>
-    slot.startTime >= start && slot.endTime <= end ? { ...slot, available: true } : slot,
+    slot.startTime >= start && slot.endTime <= end
+      ? { ...slot, available: true }
+      : slot,
   );
 
-export function rangeOf(slots: AvailabilitySlot[], start: string, end: string): SlotRange | null {
+export function rangeOf(
+  slots: AvailabilitySlot[],
+  start: string,
+  end: string,
+): SlotRange | null {
   const first = slots.findIndex((slot) => slot.startTime === start);
   const last = slots.findIndex((slot) => slot.endTime === end);
   return first >= 0 && last >= first ? { start: first, end: last } : null;
 }
 
 const clock = (mins: number) =>
-  `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
 
 export const hourlySlots = (slots: AvailabilitySlot[]) =>
   slots.flatMap(({ startTime, endTime, available }) => {

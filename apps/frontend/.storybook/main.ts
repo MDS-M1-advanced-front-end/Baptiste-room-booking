@@ -1,17 +1,29 @@
-import type { StorybookConfig } from 'storybook-framework-qwik';
-import tailwindcss from '@tailwindcss/vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import { StorybookConfig } from "storybook-framework-qwik";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
-const config = {
-  stories: ['../src/**/*.stories.@(ts|tsx)'],
-  addons: [],
+const config: StorybookConfig = {
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials"],
   framework: {
-    name: 'storybook-framework-qwik',
+    name: "storybook-framework-qwik",
   },
+  core: {
+    renderer: "storybook-framework-qwik",
+  },
+  stories: [
+    // ...rootMain.stories,
+    "../src/components/**/*.stories.mdx",
+    "../src/components/**/*.stories.@(js|jsx|ts|tsx)",
+  ],
+
   viteFinal: async (viteConfig) => ({
     ...viteConfig,
-    plugins: [...(viteConfig.plugins ?? []), tsconfigPaths({ root: '.' }), tailwindcss()],
+    plugins: [
+      ...(viteConfig.plugins ?? []),
+      tsconfigPaths({ root: "." }),
+      tailwindcss(),
+    ],
   }),
-} satisfies StorybookConfig;
+};
 
 export default config;

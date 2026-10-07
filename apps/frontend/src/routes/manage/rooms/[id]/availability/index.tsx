@@ -1,26 +1,44 @@
-import { component$, useSignal, useTask$, type QRL } from '@builder.io/qwik';
-import { Form, routeAction$, routeLoader$, zod$, type DocumentHead } from '@builder.io/qwik-city';
-import { putRoomsByRoomIdAvailability, type AvailabilitySlot } from '@room-booking/core';
-import { DayNav, SlotPicker } from '~/components/booking/slot-picker';
-import { Alert } from '~/components/ui/alert';
-import { Button, ButtonLink } from '~/components/ui/button';
-import { ASIDE_LAYOUT, CARD, CARD_BODY, STICKY_ASIDE } from '~/components/ui/card';
-import { Checkbox, Field, Input } from '~/components/ui/field';
-import { Icon } from '~/components/ui/icon';
-import { BackLink, EmptyState, PageHeader } from '~/components/ui/page-header';
-import { loadAvailability } from '~/lib/api/availability.server';
-import { api } from '~/lib/api/client.server';
-import { loadManagedRoom, managedRoom } from '~/lib/api/rooms.server';
-import { parisToday } from '~/lib/dates';
-import { formatDay } from '~/lib/format';
-import { roomError } from '~/lib/rooms';
-import { availabilityShape } from '~/lib/schemas';
-import { hourlySlots, nextSlot, type SlotRange } from '~/lib/slots';
+import { component$, useSignal, useTask$, type QRL } from "@builder.io/qwik";
+import {
+  Form,
+  routeAction$,
+  routeLoader$,
+  zod$,
+  type DocumentHead,
+} from "@builder.io/qwik-city";
+import {
+  putRoomsByRoomIdAvailability,
+  type AvailabilitySlot,
+} from "@room-booking/core";
+import { DayNav, SlotPicker } from "~/components/booking/slot-picker";
+import { Alert } from "~/components/ui/alert";
+import { Button, ButtonLink } from "~/components/ui/button";
+import {
+  ASIDE_LAYOUT,
+  CARD,
+  CARD_BODY,
+  STICKY_ASIDE,
+} from "~/components/ui/card";
+import { Checkbox, Field, Input } from "~/components/ui/field";
+import { Icon } from "~/components/ui/icon";
+import { BackLink, EmptyState, PageHeader } from "~/components/ui/page-header";
+import { loadAvailability } from "~/lib/api/availability.server";
+import { api } from "~/lib/api/client.server";
+import { loadManagedRoom, managedRoom } from "~/lib/api/rooms.server";
+import { parisToday } from "~/lib/dates";
+import { formatDay } from "~/lib/format";
+import { roomError } from "~/lib/rooms";
+import { availabilityShape } from "~/lib/schemas";
+import { hourlySlots, nextSlot, type SlotRange } from "~/lib/slots";
 
 export const useManagedRoom = routeLoader$((event) => loadManagedRoom(event));
 
 export const useDayAvailability = routeLoader$(async (event) =>
-  loadAvailability(event, (await event.resolveValue(useManagedRoom))?.id, parisToday()),
+  loadAvailability(
+    event,
+    (await event.resolveValue(useManagedRoom))?.id,
+    parisToday(),
+  ),
 );
 
 export const useSaveDay = routeAction$(async (body, event) => {
@@ -70,7 +88,9 @@ const SlotRow = component$<{
       <Checkbox
         label="Réservable"
         checked={slot.available}
-        onChange$={(_, input) => onChange$({ ...slot, available: input.checked })}
+        onChange$={(_, input) =>
+          onChange$({ ...slot, available: input.checked })
+        }
       />
       <Button variant="ghost" size="icon-sm" onClick$={() => onChange$(null)}>
         <Icon name="trash" />
@@ -109,7 +129,9 @@ export default component$(() => {
   }
   const { today, day } = availability.value;
   const failure = save.value?.failed
-    ? (save.value.message ?? save.value.fieldErrors?.slots ?? save.value.formErrors?.[0])
+    ? (save.value.message ??
+      save.value.fieldErrors?.slots ??
+      save.value.formErrors?.[0])
     : undefined;
   return (
     <>
@@ -120,14 +142,19 @@ export default component$(() => {
       />
       <div class={ASIDE_LAYOUT}>
         <section aria-label="Créneaux de la journée" class={CARD}>
-          <div class={[CARD_BODY, 'flex flex-col gap-(--space-4)']}>
+          <div class={[CARD_BODY, "flex flex-col gap-(--space-4)"]}>
             <DayNav day={day} min={today} label="Journée" />
             <Alert tone="info">
-              <p>L'enregistrement remplace tous les créneaux de cette journée.</p>
+              <p>
+                L'enregistrement remplace tous les créneaux de cette journée.
+              </p>
             </Alert>
             {save.value?.saved && (
               <Alert tone="success">
-                <p>Les créneaux du {formatDay(save.value.saved)} ont été enregistrés.</p>
+                <p>
+                  Les créneaux du {formatDay(save.value.saved)} ont été
+                  enregistrés.
+                </p>
               </Alert>
             )}
             {failure && (
@@ -136,15 +163,27 @@ export default component$(() => {
               </Alert>
             )}
             {availability.value.slots ? null : (
-              <Alert tone="danger" title="Les créneaux n'ont pas pu être chargés">
-                <p>Le serveur ne répond pas. Choisissez une autre date ou réessayez.</p>
+              <Alert
+                tone="danger"
+                title="Les créneaux n'ont pas pu être chargés"
+              >
+                <p>
+                  Le serveur ne répond pas. Choisissez une autre date ou
+                  réessayez.
+                </p>
               </Alert>
             )}
             <Form action={save} class="flex flex-col gap-(--space-4)">
               <input type="hidden" name="date" value={day} />
-              <input type="hidden" name="slots" value={JSON.stringify(slots.value)} />
+              <input
+                type="hidden"
+                name="slots"
+                value={JSON.stringify(slots.value)}
+              />
               <fieldset>
-                <legend class="font-(--font-weight-semibold)">Créneaux du {formatDay(day)}</legend>
+                <legend class="font-(--font-weight-semibold)">
+                  Créneaux du {formatDay(day)}
+                </legend>
                 {slots.value.length ? (
                   <ul>
                     {slots.value.map((slot, index) => (
@@ -154,7 +193,9 @@ export default component$(() => {
                         slot={slot}
                         onChange$={(next) =>
                           (slots.value = next
-                            ? slots.value.map((current, at) => (at === index ? next : current))
+                            ? slots.value.map((current, at) =>
+                                at === index ? next : current,
+                              )
                             : slots.value.filter((_, at) => at !== index))
                         }
                       />
@@ -169,7 +210,9 @@ export default component$(() => {
               <Button
                 variant="ghost"
                 class="self-start"
-                onClick$={() => (slots.value = [...slots.value, nextSlot(slots.value)])}
+                onClick$={() =>
+                  (slots.value = [...slots.value, nextSlot(slots.value)])
+                }
               >
                 <Icon name="plus" />
                 Ajouter un créneau
@@ -186,13 +229,17 @@ export default component$(() => {
           </div>
         </section>
         <aside aria-labelledby="client-view-title" class={STICKY_ASIDE}>
-          <div class={[CARD_BODY, 'flex flex-col gap-(--space-3)']}>
+          <div class={[CARD_BODY, "flex flex-col gap-(--space-3)"]}>
             <h2 id="client-view-title">Vue client</h2>
             <p class="text-(length:--font-size-sm) text-(--color-text-muted)">
               Les créneaux tels qu'ils apparaissent sur la fiche de la salle.
             </p>
             <div inert>
-              <SlotPicker day={day} slots={hourlySlots(slots.value)} selection={preview} />
+              <SlotPicker
+                day={day}
+                slots={hourlySlots(slots.value)}
+                selection={preview}
+              />
             </div>
           </div>
         </aside>
@@ -202,5 +249,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = ({ resolveValue }) => ({
-  title: `Disponibilités ${resolveValue(useManagedRoom)?.name ?? ''}`.trim(),
+  title: `Disponibilités ${resolveValue(useManagedRoom)?.name ?? ""}`.trim(),
 });

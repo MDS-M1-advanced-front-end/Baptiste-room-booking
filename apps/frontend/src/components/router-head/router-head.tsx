@@ -1,8 +1,8 @@
-import { component$ } from '@builder.io/qwik';
-import { useDocumentHead, useLocation } from '@builder.io/qwik-city';
+import { component$ } from "@builder.io/qwik";
+import { useDocumentHead, useLocation } from "@builder.io/qwik-city";
 
 const SITE_DESCRIPTION =
-  'Réservez facilement des salles de réunion, de formation et d’événement avec Quorum.';
+  "Réservez facilement des salles de réunion, de formation et d’événement avec Quorum.";
 
 export const RouterHead = component$(() => {
   const head = useDocumentHead();
@@ -10,7 +10,7 @@ export const RouterHead = component$(() => {
 
   return (
     <>
-      <title>{head.title ? `${head.title} · Quorum` : 'Quorum'}</title>
+      <title>{head.title ? `${head.title} · Quorum` : "Quorum"}</title>
 
       <link rel="canonical" href={loc.url.href} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,7 +31,9 @@ export const RouterHead = component$(() => {
         <style
           key={s.key}
           {...s.props}
-          {...(s.props?.dangerouslySetInnerHTML ? {} : { dangerouslySetInnerHTML: s.style })}
+          {...(s.props?.dangerouslySetInnerHTML
+            ? {}
+            : { dangerouslySetInnerHTML: s.style })}
         />
       ))}
 
@@ -39,7 +41,9 @@ export const RouterHead = component$(() => {
         <script
           key={s.key}
           {...s.props}
-          {...(s.props?.dangerouslySetInnerHTML ? {} : { dangerouslySetInnerHTML: s.script })}
+          {...(s.props?.dangerouslySetInnerHTML
+            ? {}
+            : { dangerouslySetInnerHTML: s.script })}
         />
       ))}
     </>
