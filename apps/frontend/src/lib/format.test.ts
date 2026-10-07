@@ -3,7 +3,7 @@ import {
   formatAmount,
   formatDay,
   formatDuration,
-  formatParisDate,
+  formatParis,
   formatHours,
   formatRate,
   formatShortDay,
@@ -79,13 +79,21 @@ describe('formatDuration', () => {
   });
 });
 
-describe('formatParisDate', () => {
-  it('formats an instant on its Paris calendar day', () => {
-    expect(formatParisDate('2026-02-11T09:00:00Z')).toBe('11 février 2026');
-    expect(formatParisDate('2026-02-10T23:30:00Z')).toBe('11 février 2026');
+describe('formatParis', () => {
+  it.each([
+    ['date', '2026-02-11T09:00:00Z', '11 février 2026'],
+    ['date', '2026-02-10T23:30:00Z', '11 février 2026'],
+    ['long', '2026-10-12T09:00:00Z', 'lundi 12 octobre 2026'],
+    ['short', '2026-10-12T09:00:00Z', 'lun. 12 oct.'],
+    ['day', '2026-10-12T09:00:00Z', '12'],
+    ['month', '2026-10-12T09:00:00Z', 'oct.'],
+    ['time', '2026-10-12T09:00:00Z', '11:00'],
+    ['time', '2026-11-16T14:00:00Z', '15:00'],
+  ] as const)('formats %s of %s in Paris as %s', (style, iso, expected) => {
+    expect(formatParis(iso, style)).toBe(expected);
   });
 
   it.each(['nope', ''])('returns invalid instant %s unchanged', (input) => {
-    expect(formatParisDate(input)).toBe(input);
+    expect(formatParis(input, 'time')).toBe(input);
   });
 });

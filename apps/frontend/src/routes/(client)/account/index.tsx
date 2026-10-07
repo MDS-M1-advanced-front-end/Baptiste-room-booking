@@ -11,7 +11,7 @@ import { TextField } from '~/components/ui/field';
 import { PageHeader } from '~/components/ui/page-header';
 import { api } from '~/lib/api/client.server';
 import { requireUser } from '~/lib/auth.server';
-import { formatParisDate } from '~/lib/format';
+import { formatParis } from '~/lib/format';
 import { isManager } from '~/lib/navigation';
 import { profileShape } from '~/lib/schemas';
 import { useCurrentUser } from '~/routes/layout';
@@ -102,7 +102,7 @@ export default component$(() => {
                 <Badge tone="neutral">{ROLE_LABELS[me.role]}</Badge>
               </Detail>
               {me.createdAt && (
-                <Detail term="Membre depuis">{formatParisDate(me.createdAt)}</Detail>
+                <Detail term="Membre depuis">{formatParis(me.createdAt, 'date')}</Detail>
               )}
             </Details>
             {isManager(me) ? (

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { PAGE_SIZE, isoDate, parseRoomsQuery, positiveInt, timeOfDay } from './url-params';
+import {
+  PAGE_SIZE,
+  RESERVATION_STATUSES,
+  isoDate,
+  parseRoomsQuery,
+  parseStatus,
+  positiveInt,
+  timeOfDay,
+} from './url-params';
 
 describe('positiveInt', () => {
   it.each([
@@ -82,5 +90,15 @@ describe('parseRoomsQuery', () => {
     'search=',
   ])('drops bad filter %s', (query) => {
     expect(parseRoomsQuery(new URLSearchParams(query))).toEqual({ page: 1, pageSize: PAGE_SIZE });
+  });
+});
+
+describe('parseStatus', () => {
+  it.each(RESERVATION_STATUSES)('accepts %s', (status) => {
+    expect(parseStatus(status)).toBe(status);
+  });
+
+  it.each(['FOO', 'confirmed', '', null])('rejects %s', (status) => {
+    expect(parseStatus(status)).toBeUndefined();
   });
 });

@@ -1,4 +1,4 @@
-import type { GetRoomsData } from '@room-booking/core';
+import type { GetRoomsData, ReservationStatus } from '@room-booking/core';
 
 export const PAGE_SIZE = 6;
 
@@ -37,3 +37,14 @@ export function parseRoomsQuery(params: URLSearchParams): RoomsQuery {
     Object.entries(query).filter(([, value]) => value !== undefined),
   ) as RoomsQuery;
 }
+
+export const RESERVATION_STATUSES = [
+  'PENDING',
+  'CONFIRMED',
+  'COMPLETED',
+  'CANCELLED',
+  'REJECTED',
+] as const satisfies readonly ReservationStatus[];
+
+export const parseStatus = (value: string | null): ReservationStatus | undefined =>
+  RESERVATION_STATUSES.find((status) => status === value);

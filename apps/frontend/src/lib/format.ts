@@ -45,14 +45,25 @@ export const formatDay = dayFormatter(longDay);
 
 export const formatShortDay = dayFormatter(shortDay);
 
-const parisDate = new Intl.DateTimeFormat('fr-FR', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'Europe/Paris',
-});
+const PARIS_STYLES = {
+  date: { day: 'numeric', month: 'long', year: 'numeric' },
+  long: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
+  short: { weekday: 'short', day: 'numeric', month: 'short' },
+  day: { day: 'numeric' },
+  month: { month: 'short' },
+  time: { hour: '2-digit', minute: '2-digit' },
+} satisfies Record<string, Intl.DateTimeFormatOptions>;
 
-export const formatParisDate = (iso: string) => {
+export type ParisStyle = keyof typeof PARIS_STYLES;
+
+const parisFormats = Object.fromEntries(
+  Object.entries(PARIS_STYLES).map(([style, options]) => [
+    style,
+    new Intl.DateTimeFormat('fr-FR', { ...options, timeZone: 'Europe/Paris' }),
+  ]),
+) as Record<ParisStyle, Intl.DateTimeFormat>;
+
+export const formatParis = (iso: string, style: ParisStyle) => {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : parisDate.format(date);
+  return Number.isNaN(date.getTime()) ? iso : parisFormats[style].format(date);
 };
