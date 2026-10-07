@@ -1,18 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
-
-// ponytail: local copy of the API Room shape, swap for the packages/core
-// type once `pnpm core:sync` fills it.
-export interface RoomProps {
-  id: string;
-  name: string;
-  location: string;
-  capacity: number;
-  equipment: string[];
-  pricePerHour: number;
-  status: 'ACTIVE' | 'INACTIVE';
-  imageUrl?: string | null;
-}
+import type { Room } from '@room-booking/core';
 
 const price = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
@@ -23,7 +11,7 @@ const price = new Intl.NumberFormat('fr-FR', {
 const iconClass =
   'size-[1.25em] flex-none fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]';
 
-export const RoomCard = component$<{ room: RoomProps }>(({ room }) => {
+export const RoomCard = component$<{ room: Room }>(({ room }) => {
   const inactive = room.status === 'INACTIVE';
 
   return (
@@ -57,7 +45,6 @@ export const RoomCard = component$<{ room: RoomProps }>(({ room }) => {
 
       <div class="flex flex-1 flex-col gap-(--space-2) p-(--space-4)">
         <h3 class="text-(length:--font-size-lg) leading-(--line-height-tight) font-(--font-weight-bold)">
-          {/* ::after stretches the link: whole card clickable, one link announced */}
           <Link
             href={`/rooms/${room.id}`}
             class="text-(--color-text) no-underline after:absolute after:inset-0 focus-visible:outline-none"
@@ -84,7 +71,7 @@ export const RoomCard = component$<{ room: RoomProps }>(({ room }) => {
           </span>
         </p>
 
-        {room.equipment.length > 0 && (
+        {room.equipment?.length ? (
           <ul class="flex flex-wrap gap-(--space-1)">
             {room.equipment.map((item) => (
               <li
@@ -95,7 +82,7 @@ export const RoomCard = component$<{ room: RoomProps }>(({ room }) => {
               </li>
             ))}
           </ul>
-        )}
+        ) : null}
 
         <div class="mt-auto flex items-baseline justify-between pt-(--space-2)">
           {inactive && (

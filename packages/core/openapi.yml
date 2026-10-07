@@ -1,0 +1,1284 @@
+openapi: 3.0.3
+info:
+  title: API - Plateforme de réservation de salles
+  description: |
+    API REST permettant de gérer les utilisateurs, les salles, leurs disponibilités
+    et les réservations d'une plateforme de réservation de salles en ligne.
+  version: 1.0.0
+  contact:
+    name: Équipe projet
+
+servers:
+  - url: http://localhost:8080/api
+    description: Serveur local
+  - url: https://api.example.com/api
+    description: Serveur de production
+
+tags:
+  - name: Authentification
+  - name: Utilisateurs
+  - name: Salles
+  - name: Disponibilités
+  - name: Réservations
+  - name: Administration
+  - name: Paiement
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /auth/register:
+    post:
+      tags: [Authentification]
+      summary: Créer un compte utilisateur
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Compte créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Adresse e-mail déjà utilisée
+
+  /auth/login:
+    post:
+      tags: [Authentification]
+      summary: Se connecter
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentification réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      tags: [Authentification]
+      summary: Récupérer le profil de l'utilisateur connecté
+      responses:
+        '200':
+          description: Profil utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/password:
+    patch:
+      tags: [Authentification]
+      summary: Modifier son mot de passe
+      description: Change le mot de passe de l'utilisateur connecté. L'ancien mot de passe est exigé.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '204':
+          description: Mot de passe modifié
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users:
+    get:
+      tags: [Utilisateurs]
+      summary: Lister les utilisateurs
+      description: Réservé aux administrateurs.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: role
+          in: query
+          schema:
+            $ref: '#/components/schemas/UserRole'
+      responses:
+        '200':
+          description: Liste paginée des utilisateurs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsers'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{userId}:
+    get:
+      tags: [Utilisateurs]
+      summary: Consulter un utilisateur
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Utilisateurs]
+      summary: Modifier un utilisateur
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Utilisateur modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Utilisateurs]
+      summary: Supprimer un utilisateur
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '204':
+          description: Utilisateur supprimé
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rooms:
+    get:
+      tags: [Salles]
+      summary: Rechercher et lister les salles
+      security: []
+      parameters:
+        - name: search
+          in: query
+          description: Recherche par nom ou description
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 255
+        - name: location
+          in: query
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 255
+        - name: capacityMin
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            format: int32
+        - name: capacityMax
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            format: int32
+        - name: date
+          in: query
+          description: Date recherchée au format YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: startTime
+          in: query
+          schema:
+            $ref: '#/components/schemas/TimeOfDay'
+        - name: endTime
+          in: query
+          schema:
+            $ref: '#/components/schemas/TimeOfDay'
+        - name: available
+          in: query
+          description: Filtre sur la disponibilité ; ignoré sans `date`
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Liste des salles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRooms'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+    post:
+      tags: [Salles]
+      summary: Ajouter une salle
+      description: Réservé aux propriétaires/gestionnaires et administrateurs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateRequest'
+      responses:
+        '201':
+          description: Salle créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /rooms/{roomId}:
+    get:
+      tags: [Salles]
+      summary: Consulter les détails d'une salle
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '200':
+          description: Détails de la salle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+    patch:
+      tags: [Salles]
+      summary: Modifier une salle
+      description: |
+        Réservé au gestionnaire propriétaire de la salle et aux administrateurs.
+        Modification partielle : seuls les champs envoyés sont modifiés.
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateRequest'
+      responses:
+        '200':
+          description: Salle modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Salles]
+      summary: Supprimer une salle
+      description: Réservé au gestionnaire propriétaire de la salle et aux administrateurs.
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '204':
+          description: Salle supprimée
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /rooms/{roomId}/availability:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Disponibilités]
+      summary: Consulter les disponibilités d'une salle
+      security: []
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: startTime
+          in: query
+          schema:
+            $ref: '#/components/schemas/TimeOfDay'
+        - name: endTime
+          in: query
+          schema:
+            $ref: '#/components/schemas/TimeOfDay'
+      responses:
+        '200':
+          description: Créneaux disponibles
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 1000
+                items:
+                  $ref: '#/components/schemas/AvailabilitySlot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+    put:
+      tags: [Disponibilités]
+      summary: Définir les disponibilités d'une salle
+      description: |
+        Réservé au gestionnaire propriétaire de la salle et aux administrateurs.
+        Remplace l'ensemble des créneaux de la date indiquée.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvailabilityUpdateRequest'
+      responses:
+        '200':
+          description: Disponibilités mises à jour
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilitySlot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reservations:
+    get:
+      tags: [Réservations]
+      summary: Consulter ses réservations
+      description: |
+        Renvoie uniquement les réservations de l'utilisateur connecté, y compris
+        celles au statut CANCELLED. Les filtres `from` et `to` portent sur la date
+        de début (`startAt`) et sont inclusifs.
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReservationStatus'
+        - name: from
+          in: query
+          description: Réservations dont `startAt` est à partir de cette date (incluse)
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          description: Réservations dont `startAt` est jusqu'à cette date (incluse)
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Liste des réservations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReservations'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Réservations]
+      summary: Réserver une salle
+      description: |
+        Vérifie la disponibilité avant de créer la réservation.
+        La réservation est créée au statut PENDING, puis passe à CONFIRMED ou
+        REJECTED via `/confirm` ou `/reject`. `startAt` doit être strictement
+        antérieur à `endAt`, et `numberOfParticipants` ne doit pas dépasser la
+        capacité de la salle (sinon 400).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateRequest'
+      responses:
+        '201':
+          description: Réservation créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /reservations/{reservationId}:
+    get:
+      tags: [Réservations]
+      summary: Consulter une réservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: Réservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Réservations]
+      summary: Modifier une réservation
+      description: |
+        Seules les réservations PENDING ou CONFIRMED peuvent être modifiées (sinon 409).
+        Une modification du créneau d'une réservation CONFIRMED la repasse à PENDING.
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationUpdateRequest'
+      responses:
+        '200':
+          description: Réservation modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Nouveau créneau indisponible ou réservation non modifiable dans son statut actuel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags: [Réservations]
+      summary: Annuler une réservation
+      description: |
+        Annulation logique : la réservation n'est pas supprimée, elle passe au
+        statut CANCELLED et reste consultable. Seules les réservations PENDING ou
+        CONFIRMED peuvent être annulées (sinon 409).
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '204':
+          description: Réservation annulée (statut CANCELLED)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /reservations/{reservationId}/confirm:
+    post:
+      tags: [Réservations]
+      summary: Confirmer une réservation
+      description: |
+        Utilisé par le gestionnaire de la salle ou un administrateur lorsque la validation est requise.
+        Seule une réservation au statut PENDING peut être confirmée (sinon 409).
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: Réservation confirmée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+              example:
+                id: 00000000-0000-4000-8000-300000000001
+                roomId: 00000000-0000-4000-8000-100000000001
+                userId: 00000000-0000-4000-8000-200000000001
+                startAt: '2026-10-12T09:00:00Z'
+                endAt: '2026-10-12T12:00:00Z'
+                status: CONFIRMED
+                totalAmount: 135.0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /reservations/{reservationId}/reject:
+    post:
+      tags: [Réservations]
+      summary: Refuser une réservation
+      description: |
+        Utilisé par le gestionnaire de la salle ou un administrateur.
+        Seule une réservation au statut PENDING peut être refusée (sinon 409).
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRejectRequest'
+      responses:
+        '200':
+          description: Réservation refusée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+              example:
+                id: 00000000-0000-4000-8000-300000000001
+                roomId: 00000000-0000-4000-8000-100000000001
+                userId: 00000000-0000-4000-8000-200000000001
+                startAt: '2026-10-12T09:00:00Z'
+                endAt: '2026-10-12T12:00:00Z'
+                status: REJECTED
+                totalAmount: 135.0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /payments:
+    post:
+      tags: [Paiement]
+      summary: Initier le paiement d'une réservation
+      description: Réservé au client auteur de la réservation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+      responses:
+        '201':
+          description: Paiement initié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /payments/{paymentId}:
+    get:
+      tags: [Paiement]
+      summary: Consulter le statut d'un paiement
+      parameters:
+        - $ref: '#/components/parameters/PaymentId'
+      responses:
+        '200':
+          description: Paiement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/reservations:
+    get:
+      tags: [Administration]
+      summary: Gérer toutes les réservations
+      description: Réservé aux administrateurs.
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReservationStatus'
+        - name: roomId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Réservations administratives
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReservations'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/statistics:
+    get:
+      tags: [Administration]
+      summary: Consulter les statistiques
+      description: Réservé aux administrateurs.
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statistiques de la plateforme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PaymentId:
+      name: paymentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Authentification requise ou invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Accès interdit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Conflict:
+      description: Conflit avec l'état actuel de la ressource (créneau indisponible, statut incompatible)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotAcceptable:
+      description: Format de réponse demandé (en-tête Accept) non supporté
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Trop de requêtes, réessayer plus tard
+      headers:
+        Retry-After:
+          description: Délai en secondes avant de réessayer
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 86400
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+
+    UserRole:
+      type: string
+      enum:
+        - CLIENT
+        - GESTIONNAIRE
+        - ADMINISTRATEUR
+
+    User:
+      type: object
+      required: [id, firstName, lastName, email, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        createdAt:
+          type: string
+          format: date-time
+
+    RegisterRequest:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    AuthResponse:
+      type: object
+      required: [accessToken, user]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          example: 3600
+        user:
+          $ref: '#/components/schemas/User'
+
+    ChangePasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+
+    Room:
+      type: object
+      required: [id, name, capacity, location, pricePerHour, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Salle Paris
+        description:
+          type: string
+        capacity:
+          type: integer
+          minimum: 1
+          example: 20
+        location:
+          type: string
+          example: Paris
+        equipment:
+          type: array
+          items:
+            type: string
+          example: [Wi-Fi, Vidéoprojecteur, Tableau blanc]
+        pricePerHour:
+          type: number
+          format: double
+          minimum: 0
+          example: 35.00
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+        ownerId:
+          type: string
+          format: uuid
+        imageUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+
+    RoomCreateRequest:
+      type: object
+      required: [name, capacity, location, pricePerHour]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+          minimum: 1
+        location:
+          type: string
+        equipment:
+          type: array
+          items:
+            type: string
+        pricePerHour:
+          type: number
+          format: double
+          minimum: 0
+        imageUrl:
+          type: string
+          format: uri
+
+    RoomUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+          minimum: 1
+        location:
+          type: string
+        equipment:
+          type: array
+          items:
+            type: string
+        pricePerHour:
+          type: number
+          format: double
+          minimum: 0
+        imageUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+
+    TimeOfDay:
+      description: Heure locale au format HH:mm
+      type: string
+      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+      example: '14:30'
+
+    AvailabilitySlot:
+      type: object
+      required: [startTime, endTime, available]
+      properties:
+        startTime:
+          $ref: '#/components/schemas/TimeOfDay'
+        endTime:
+          $ref: '#/components/schemas/TimeOfDay'
+        available:
+          type: boolean
+
+    AvailabilityUpdateRequest:
+      type: object
+      required: [date, slots]
+      properties:
+        date:
+          type: string
+          format: date
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailabilitySlot'
+
+    ReservationStatus:
+      type: string
+      description: |
+        Cycle de vie : PENDING à la création, puis CONFIRMED ou REJECTED (gestionnaire/admin).
+        PENDING ou CONFIRMED peut passer à CANCELLED (annulation).
+        CONFIRMED passe à COMPLETED automatiquement une fois `endAt` dépassé.
+      enum:
+        - PENDING
+        - CONFIRMED
+        - REJECTED
+        - CANCELLED
+        - COMPLETED
+
+    Reservation:
+      type: object
+      required:
+        - id
+        - roomId
+        - userId
+        - startAt
+        - endAt
+        - status
+        - totalAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/ReservationStatus'
+        numberOfParticipants:
+          type: integer
+          minimum: 1
+        comment:
+          type: string
+        totalAmount:
+          type: number
+          format: double
+          minimum: 0
+        currency:
+          type: string
+          example: EUR
+        createdAt:
+          type: string
+          format: date-time
+
+    ReservationCreateRequest:
+      type: object
+      required: [roomId, startAt, endAt]
+      properties:
+        roomId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        numberOfParticipants:
+          type: integer
+          minimum: 1
+        comment:
+          type: string
+
+    ReservationUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        numberOfParticipants:
+          type: integer
+          minimum: 1
+        comment:
+          type: string
+
+    ReservationRejectRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+
+    Payment:
+      type: object
+      required: [id, reservationId, amount, currency, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        reservationId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: EUR
+        status:
+          type: string
+          enum: [PENDING, PAID, FAILED, REFUNDED]
+        paymentUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentCreateRequest:
+      type: object
+      required: [reservationId, paymentMethod]
+      properties:
+        reservationId:
+          type: string
+          format: uuid
+        paymentMethod:
+          type: string
+          enum: [CARD, PAYPAL]
+
+    Statistics:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        totalRooms:
+          type: integer
+        totalReservations:
+          type: integer
+        confirmedReservations:
+          type: integer
+        cancelledReservations:
+          type: integer
+        totalRevenue:
+          type: number
+          format: double
+
+    PaginatedUsers:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedRooms:
+      type: object
+      required: [items, page, pageSize, total]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Room'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedReservations:
+      type: object
+      required: [items, page, pageSize, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Les données fournies sont invalides.
+        details:
+          type: object
+          additionalProperties: true

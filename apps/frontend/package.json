@@ -1,6 +1,6 @@
 {
-  "name": "my-qwik-empty-starter",
-  "description": "Blank project with routing included",
+  "name": "@room-booking/frontend",
+  "description": "Quorum room booking front",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
@@ -20,7 +20,9 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.20.1",
@@ -31,6 +33,7 @@
     "eslint": "9.32.0",
     "eslint-plugin-qwik": "^1.20.1",
     "globals": "16.4.0",
+    "happy-dom": "^20.14.5",
     "prettier": "3.6.2",
     "qwik-image": "^2.0.4",
     "tailwindcss": "^4.3.3",
@@ -40,6 +43,10 @@
     "undici": "*",
     "vite": "7.3.1",
     "vite-plugin-pwa": "^2.0.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@room-booking/core": "workspace:*"
   }
 }
