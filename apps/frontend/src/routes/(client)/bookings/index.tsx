@@ -9,8 +9,8 @@ import {
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import {
-  deleteReservationsByReservationId,
-  getReservations,
+  cancelReservation,
+  listReservations,
   type Reservation,
 } from "@room-booking/core";
 import {
@@ -42,7 +42,7 @@ const TAB_LABELS = {
 export const useBookings = routeLoader$(async (event) => {
   const status = parseStatus(event.url.searchParams.get("status"));
   const client = api(event);
-  const { data } = await getReservations({
+  const { data } = await listReservations({
     client,
     query: { status, pageSize: 100 },
   });
@@ -63,7 +63,7 @@ export const useBookings = routeLoader$(async (event) => {
 export const useCancelReservation = routeAction$(
   async ({ reservationId }, event) => {
     requireUser(event);
-    const { error, response } = await deleteReservationsByReservationId({
+    const { error, response } = await cancelReservation({
       client: api(event),
       path: { reservationId },
     });

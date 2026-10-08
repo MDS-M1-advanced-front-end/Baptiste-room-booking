@@ -23,6 +23,7 @@ const reservation = (
   startAt,
   endAt,
   totalAmount: 0,
+  currency: "EUR",
 });
 
 const future = reservation(

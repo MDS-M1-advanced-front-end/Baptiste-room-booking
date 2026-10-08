@@ -8,8 +8,8 @@ import {
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import {
-  getRoomsByRoomId,
-  postReservations,
+  getRoom,
+  createReservation,
   type AvailabilitySlot,
   type Room,
 } from "@room-booking/core";
@@ -43,7 +43,7 @@ import type { SlotRange } from "~/lib/slots";
 import { useCurrentUser } from "~/routes/layout";
 
 export const useRoom = routeLoader$(async (event) => {
-  const { data } = await getRoomsByRoomId({
+  const { data } = await getRoom({
     client: api(event),
     path: { roomId: event.params.id },
   });
@@ -63,7 +63,7 @@ export const useCreateReservation = routeAction$(async (input, event) => {
   if (!currentUser(event))
     return event.fail(401, { message: reservationError(401) });
   const client = api(event);
-  const { data: room } = await getRoomsByRoomId({
+  const { data: room } = await getRoom({
     client,
     path: { roomId: event.params.id },
   });
@@ -71,7 +71,7 @@ export const useCreateReservation = routeAction$(async (input, event) => {
   const tooMany = capacityError(room.capacity, input.numberOfParticipants);
   if (tooMany)
     return event.fail(400, { fieldErrors: { numberOfParticipants: tooMany } });
-  const { data, response } = await postReservations({
+  const { data, response } = await createReservation({
     client,
     body: { roomId: room.id, ...reservationTimes(input) },
   });

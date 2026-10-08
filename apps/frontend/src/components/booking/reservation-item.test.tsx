@@ -14,6 +14,7 @@ const reservation: Reservation = {
   numberOfParticipants: 8,
   comment: "Atelier UX",
   totalAmount: 135,
+  currency: "EUR",
 };
 
 async function renderItem(value: Reservation, withAction = false) {

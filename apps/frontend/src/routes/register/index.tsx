@@ -8,7 +8,7 @@ import {
   type DocumentHead,
   type RequestHandler,
 } from "@builder.io/qwik-city";
-import { postAuthLogin, postAuthRegister } from "@room-booking/core";
+import { loginUser, registerUser } from "@room-booking/core";
 import { AuthCard } from "~/components/layout/auth-card";
 import { Alert } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -32,7 +32,7 @@ export const onGet: RequestHandler = (event) => {
 
 export const useRegister = routeAction$(async (account, event) => {
   const client = api(event);
-  const { data: user, response } = await postAuthRegister({
+  const { data: user, response } = await registerUser({
     client,
     body: account,
   });
@@ -44,7 +44,7 @@ export const useRegister = routeAction$(async (account, event) => {
           : "Le compte n’a pas pu être créé. Réessayez dans un instant.",
     });
   }
-  const { data: auth } = await postAuthLogin({
+  const { data: auth } = await loginUser({
     client,
     body: { email: user.email, password: account.password },
   });

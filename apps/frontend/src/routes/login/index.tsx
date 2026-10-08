@@ -8,7 +8,7 @@ import {
   type DocumentHead,
   type RequestHandler,
 } from "@builder.io/qwik-city";
-import { postAuthLogin } from "@room-booking/core";
+import { loginUser } from "@room-booking/core";
 import { AuthCard } from "~/components/layout/auth-card";
 import { Alert } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -23,7 +23,7 @@ export const onGet: RequestHandler = (event) => {
 };
 
 export const useLogin = routeAction$(async (credentials, event) => {
-  const { data } = await postAuthLogin({
+  const { data } = await loginUser({
     client: api(event),
     body: credentials,
   });
