@@ -2,7 +2,7 @@ import { component$, $, useSignal } from "@builder.io/qwik";
 import type { Reservation, User } from "@room-booking/core";
 import type { Meta, StoryObj } from "storybook-framework-qwik";
 import { Alert } from "./alert";
-import { Avatar } from "./avatar";
+import { Avatar, initials } from "./avatar";
 import { Badge, Count, StatusBadge } from "./badge";
 import { Button, ButtonLink } from "./button";
 import { ChipList } from "./chip-list";
@@ -57,7 +57,7 @@ export const Alerts: Story = {
 export const AvatarsAndBadges: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-(--space-3)">
-      <Avatar user={user} />
+      <Avatar text={initials(user)} />
       <Badge tone="neutral">Neutre</Badge>
       <Badge tone="pending">En attente</Badge>
       <Badge tone="confirmed">Confirmée</Badge>
