@@ -46,6 +46,8 @@ setExamples('/auth/login', 'post', '200', mapValues(usersByKey, authResponse));
 setExamples('/auth/me', 'get', '200', mapValues(usersByKey, withoutKey));
 setExamples('/users', 'get', '200', { all: page(users.map(withoutKey)) });
 setExamples('/reservations', 'get', '200', { all: page(reservations) });
+setExamples('/reservations/{reservationId}', 'get', '200', byKey(reservations, 'id'));
+setExamples('/users/{userId}', 'get', '200', mapValues(usersByKey, withoutKey));
 setExamples('/admin/reservations', 'get', '200', { all: page(reservations) });
 
 function mapValues(object, fn) {

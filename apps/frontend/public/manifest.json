@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Quorum",
+  "short_name": "Quorum",
+  "description": "Réservez facilement des salles de réunion, de formation et d'événement avec Quorum.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f7f5",
+  "theme_color": "#0f5e5a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

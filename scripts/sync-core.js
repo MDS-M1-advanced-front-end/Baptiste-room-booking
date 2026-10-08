@@ -5,7 +5,7 @@ import { cpSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 
-const repoUrl = process.argv[2];
+const [repoUrl, branch] = process.argv.slice(2);
 if (!repoUrl) {
   console.error('Usage : node scripts/sync-core.js <url-du-depot-core>');
   process.exit(1);
@@ -16,7 +16,11 @@ const excluded = new Set(['.git', '.github', 'node_modules', 'pnpm-lock.yaml']);
 const tmp = mkdtempSync(join(tmpdir(), 'core-'));
 
 try {
-  execFileSync('git', ['clone', '--depth', '1', repoUrl, tmp], { stdio: 'inherit' });
+  execFileSync(
+    'git',
+    ['clone', '--depth', '1', ...(branch ? ['--branch', branch] : []), repoUrl, tmp],
+    { stdio: 'inherit' },
+  );
   const commit = execFileSync('git', ['-C', tmp, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 
   rmSync(target, { recursive: true, force: true });

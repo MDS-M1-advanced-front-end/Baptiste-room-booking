@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "qwik": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["node_modules/@qwik.dev/mcp/dist/cli.js", "apps/frontend"]
+    }
+  }
+}
