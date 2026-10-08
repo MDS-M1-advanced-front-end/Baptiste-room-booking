@@ -8,6 +8,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 8,
     "totalAmount": 135.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Atelier UX"
   },
@@ -20,6 +21,7 @@
     "status": "PENDING",
     "numberOfParticipants": 90,
     "totalAmount": 1000.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Conférence annuelle"
   },
@@ -32,6 +34,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 18,
     "totalAmount": 480.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z"
   },
   {
@@ -43,6 +46,7 @@
     "status": "PENDING",
     "numberOfParticipants": 45,
     "totalAmount": 720.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Afterwork équipe, traiteur prévu"
   },
@@ -55,6 +59,7 @@
     "status": "COMPLETED",
     "numberOfParticipants": 6,
     "totalAmount": 80.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z"
   },
   {
@@ -66,6 +71,7 @@
     "status": "CANCELLED",
     "numberOfParticipants": 50,
     "totalAmount": 480.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Annulé suite report"
   },
@@ -78,6 +84,7 @@
     "status": "REJECTED",
     "numberOfParticipants": 12,
     "totalAmount": 140.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Comité de direction"
   },
@@ -90,6 +97,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 2,
     "totalAmount": 20.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Entretien de recrutement"
   }
