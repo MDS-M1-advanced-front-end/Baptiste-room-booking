@@ -3,6 +3,7 @@ import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
+import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
 type PkgDep = Record<string, string>;
 const { dependencies = {}, devDependencies = {} } = pkg as any as {
@@ -18,6 +19,16 @@ export default defineConfig((): UserConfig => ({
     qwikVite(),
     tsconfigPaths({ root: "." }),
     tailwindcss(),
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: false,
+      injectRegister: false,
+      workbox: {
+        globPatterns: ["**/*.{js,css,svg,png,webmanifest}"],
+        // Qwik City SSR: an SPA fallback would serve the shell for every route
+        navigateFallback: null,
+      },
+    }),
   ],
   ssr: { noExternal: ["@room-booking/core"] },
 }));
