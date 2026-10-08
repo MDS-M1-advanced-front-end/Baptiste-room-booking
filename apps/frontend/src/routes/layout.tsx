@@ -4,7 +4,7 @@ import {
   routeLoader$,
   type RequestHandler,
 } from "@builder.io/qwik-city";
-import { getAuthMe, getReservations } from "@room-booking/core";
+import { getCurrentUser, listReservations } from "@room-booking/core";
 import {
   CONTAINER,
   SiteFooter,
@@ -18,7 +18,7 @@ import { clearToken, readToken } from "~/lib/session.server";
 export const onRequest: RequestHandler = async (event) => {
   event.cacheControl({ noCache: true, private: true });
   if (!readToken(event.cookie)) return;
-  const { data } = await getAuthMe({ client: api(event) });
+  const { data } = await getCurrentUser({ client: api(event) });
   if (data) event.sharedMap.set(USER_KEY, data);
   else clearToken(event.cookie);
 };
@@ -29,7 +29,7 @@ export const useCurrentUser = routeLoader$(
 
 export const usePendingCount = routeLoader$(async (event) => {
   if (!isManager(currentUser(event))) return 0;
-  const { data } = await getReservations({
+  const { data } = await listReservations({
     client: api(event),
     query: { status: "PENDING", pageSize: 1 },
   });

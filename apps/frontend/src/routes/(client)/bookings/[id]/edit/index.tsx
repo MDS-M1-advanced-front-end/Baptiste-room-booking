@@ -7,9 +7,9 @@ import {
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import {
-  getReservationsByReservationId,
-  getRoomsByRoomId,
-  patchReservationsByReservationId,
+  getReservation,
+  getRoom,
+  updateReservation,
   type Client,
 } from "@room-booking/core";
 import {
@@ -42,12 +42,12 @@ async function ownBooking(
   reservationId: string,
   userId: string,
 ) {
-  const { data: reservation } = await getReservationsByReservationId({
+  const { data: reservation } = await getReservation({
     client,
     path: { reservationId },
   });
   if (!reservation || reservation.userId !== userId) return null;
-  const { data: room } = await getRoomsByRoomId({
+  const { data: room } = await getRoom({
     client,
     path: { roomId: reservation.roomId },
   });
@@ -110,7 +110,7 @@ export const useUpdateReservation = routeAction$(async (input, event) => {
   );
   if (tooMany)
     return event.fail(400, { fieldErrors: { numberOfParticipants: tooMany } });
-  const { data, response } = await patchReservationsByReservationId({
+  const { data, response } = await updateReservation({
     client,
     path: { reservationId: booking.reservation.id },
     body: reservationTimes(input),

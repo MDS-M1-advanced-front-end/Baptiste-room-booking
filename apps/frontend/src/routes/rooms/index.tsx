@@ -4,7 +4,7 @@ import {
   useLocation,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import { getRooms } from "@room-booking/core";
+import { listRooms } from "@room-booking/core";
 import { RoomCard } from "~/components/room-card/room-card";
 import { Alert } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
@@ -30,7 +30,7 @@ const ROOMS = "/rooms/";
 
 export const useRooms = routeLoader$(async (event) => {
   const query = parseRoomsQuery(event.url.searchParams);
-  const { data } = await getRooms({ client: api(event), query });
+  const { data } = await listRooms({ client: api(event), query });
   return { query, result: data ?? null };
 });
 

@@ -1,8 +1,8 @@
-import type { GetRoomsData, ReservationStatus } from "@room-booking/core";
+import type { ListRoomsData, ReservationStatus } from "@room-booking/core";
 
 export const PAGE_SIZE = 6;
 
-export type RoomsQuery = NonNullable<GetRoomsData["query"]> & {
+export type RoomsQuery = NonNullable<ListRoomsData["query"]> & {
   page: number;
   pageSize: number;
 };

@@ -9,9 +9,9 @@ import {
   type RequestEventAction,
 } from "@builder.io/qwik-city";
 import {
-  getReservations,
-  postReservationsByReservationIdConfirm,
-  postReservationsByReservationIdReject,
+  listReservations,
+  confirmReservation,
+  rejectReservation,
   type Reservation,
   type User,
 } from "@room-booking/core";
@@ -44,7 +44,7 @@ const fullName = (user?: Pick<User, "firstName" | "lastName">) =>
 export const useRequests = routeLoader$(async (event) => {
   requireRole(event, MANAGER_ROLES);
   const client = api(event);
-  const { data } = await getReservations({ client, query: { pageSize: 100 } });
+  const { data } = await listReservations({ client, query: { pageSize: 100 } });
   if (!data) return null;
   const [rooms, users] = await Promise.all([
     roomsById(
@@ -80,8 +80,8 @@ async function decide(
   const path = { reservationId };
   const { error, response } =
     decision === "confirm"
-      ? await postReservationsByReservationIdConfirm({ client, path })
-      : await postReservationsByReservationIdReject({
+      ? await confirmReservation({ client, path })
+      : await rejectReservation({
           client,
           path,
           body: reason ? { reason } : undefined,

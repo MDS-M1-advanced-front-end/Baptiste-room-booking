@@ -5,7 +5,7 @@ import {
   zod$,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import { patchUsersByUserId } from "@room-booking/core";
+import { updateUser } from "@room-booking/core";
 import { Alert } from "~/components/ui/alert";
 import { Badge, ROLE_LABELS } from "~/components/ui/badge";
 import { Button, ButtonLink } from "~/components/ui/button";
@@ -29,7 +29,7 @@ const FIELDS = {
 
 export const useUpdateProfile = routeAction$(async (input, event) => {
   const user = requireUser(event);
-  const { data, response } = await patchUsersByUserId({
+  const { data, response } = await updateUser({
     client: api(event),
     path: { userId: user.id },
     body: input,

@@ -3,9 +3,9 @@ import type {
   RequestEventLoader,
 } from "@builder.io/qwik-city";
 import {
-  getReservationsByReservationId,
-  getRoomsByRoomId,
-  getUsersByUserId,
+  getReservation,
+  getRoom,
+  getUser,
   type Client,
 } from "@room-booking/core";
 import { api } from "~/lib/api/client.server";
@@ -26,16 +26,16 @@ async function byId<T extends { id: string }>(
 }
 
 export const roomsById = (client: Client, ids: string[]) =>
-  byId(ids, (roomId) => getRoomsByRoomId({ client, path: { roomId } }));
+  byId(ids, (roomId) => getRoom({ client, path: { roomId } }));
 
 export const usersById = (client: Client, ids: string[]) =>
-  byId(ids, (userId) => getUsersByUserId({ client, path: { userId } }));
+  byId(ids, (userId) => getUser({ client, path: { userId } }));
 
 type ManagerEvent = Parameters<typeof requireRole>[0] & RequestEventBase;
 
 export async function managedRoom(event: ManagerEvent) {
   const user = requireRole(event, MANAGER_ROLES);
-  const { data: room } = await getRoomsByRoomId({
+  const { data: room } = await getRoom({
     client: api(event),
     path: { roomId: event.params.id },
   });
@@ -54,17 +54,17 @@ export async function managedReservation(
 ) {
   const user = requireRole(event, MANAGER_ROLES);
   const client = api(event);
-  const { data: reservation } = await getReservationsByReservationId({
+  const { data: reservation } = await getReservation({
     client,
     path: { reservationId },
   });
   if (!reservation) return { status: 404 } as const;
-  const { data: room } = await getRoomsByRoomId({
+  const { data: room } = await getRoom({
     client,
     path: { roomId: reservation.roomId },
   });
   if (!room || !canManage(room, user)) return { status: 403 } as const;
-  const { data: requester } = await getUsersByUserId({
+  const { data: requester } = await getUser({
     client,
     path: { userId: reservation.userId },
   });

@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { routeAction$, zod$, type DocumentHead } from "@builder.io/qwik-city";
-import { postRooms } from "@room-booking/core";
+import { createRoom } from "@room-booking/core";
 import { RoomForm } from "~/components/room-form/room-form";
 import { api } from "~/lib/api/client.server";
 import { requireRole } from "~/lib/auth.server";
@@ -10,7 +10,7 @@ import { roomShape } from "~/lib/schemas";
 
 export const useCreateRoom = routeAction$(async (body, event) => {
   requireRole(event, MANAGER_ROLES);
-  const { data, response } = await postRooms({ client: api(event), body });
+  const { data, response } = await createRoom({ client: api(event), body });
   if (!data)
     return event.fail(response?.status ?? 500, {
       message: roomError(response?.status),

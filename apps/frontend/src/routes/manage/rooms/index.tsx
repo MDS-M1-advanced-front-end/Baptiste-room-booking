@@ -8,11 +8,7 @@ import {
   zod$,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import {
-  deleteRoomsByRoomId,
-  getRooms,
-  getRoomsByRoomId,
-} from "@room-booking/core";
+import { deleteRoom, listRooms, getRoom } from "@room-booking/core";
 import { RoomPhoto } from "~/components/room-card/room-card";
 import { Alert } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
@@ -34,7 +30,7 @@ const DELETE_ERRORS: Record<number, string> = {
 
 export const useManagedRooms = routeLoader$(async (event) => {
   const user = requireRole(event, MANAGER_ROLES);
-  const { data } = await getRooms({
+  const { data } = await listRooms({
     client: api(event),
     query: { pageSize: 100 },
   });
@@ -45,13 +41,13 @@ export const useDeleteRoom = routeAction$(
   async ({ roomId }, event) => {
     const user = requireRole(event, MANAGER_ROLES);
     const client = api(event);
-    const { data: room } = await getRoomsByRoomId({ client, path: { roomId } });
+    const { data: room } = await getRoom({ client, path: { roomId } });
     if (!room || !canManage(room, user)) {
       return event.fail(room ? 403 : 404, {
         message: DELETE_ERRORS[room ? 403 : 404],
       });
     }
-    const { error, response } = await deleteRoomsByRoomId({
+    const { error, response } = await deleteRoom({
       client,
       path: { roomId },
     });
