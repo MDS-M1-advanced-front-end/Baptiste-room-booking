@@ -6,7 +6,7 @@ import {
   type ActionStore,
 } from "@builder.io/qwik-city";
 import type { User } from "@room-booking/core";
-import { Avatar } from "~/components/ui/avatar";
+import { Avatar, initials } from "~/components/ui/avatar";
 import { Count } from "~/components/ui/badge";
 import { Button, ButtonLink } from "~/components/ui/button";
 import { Icon } from "~/components/ui/icon";
@@ -71,7 +71,7 @@ const NavList = component$<NavProps>(
                   url.pathname.startsWith("/account/") ? "page" : undefined
                 }
               >
-                <Avatar user={user} />
+                <Avatar text={initials(user)} />
                 {user.firstName} {user.lastName}
               </Link>
             </li>
