@@ -4,4 +4,7 @@ packages:
 
 # Scripts d'installation : @scarf/scarf (télémétrie tirée par Prism) est refusé
 allowBuilds:
+  '@parcel/watcher': true
   '@scarf/scarf': false
+  esbuild: true
+  sharp: false

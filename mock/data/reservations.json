@@ -8,6 +8,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 8,
     "totalAmount": 135.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Atelier UX"
   },
@@ -17,9 +18,10 @@
     "userId": "00000000-0000-4000-8000-200000000001",
     "startAt": "2026-10-20T14:00:00Z",
     "endAt": "2026-10-20T18:00:00Z",
-    "status": "PENDING",
+    "status": "PENDING_PAYMENT",
     "numberOfParticipants": 90,
     "totalAmount": 1000.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Conférence annuelle"
   },
@@ -32,6 +34,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 18,
     "totalAmount": 480.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z"
   },
   {
@@ -40,9 +43,10 @@
     "userId": "00000000-0000-4000-8000-200000000002",
     "startAt": "2026-11-05T18:00:00Z",
     "endAt": "2026-11-05T22:00:00Z",
-    "status": "PENDING",
+    "status": "PENDING_PAYMENT",
     "numberOfParticipants": 45,
     "totalAmount": 720.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Afterwork équipe, traiteur prévu"
   },
@@ -55,6 +59,7 @@
     "status": "COMPLETED",
     "numberOfParticipants": 6,
     "totalAmount": 80.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z"
   },
   {
@@ -66,6 +71,7 @@
     "status": "CANCELLED",
     "numberOfParticipants": 50,
     "totalAmount": 480.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Annulé suite report"
   },
@@ -75,9 +81,10 @@
     "userId": "00000000-0000-4000-8000-200000000001",
     "startAt": "2026-10-08T08:00:00Z",
     "endAt": "2026-10-08T10:00:00Z",
-    "status": "REJECTED",
+    "status": "REFUSED",
     "numberOfParticipants": 12,
     "totalAmount": 140.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Comité de direction"
   },
@@ -90,6 +97,7 @@
     "status": "CONFIRMED",
     "numberOfParticipants": 2,
     "totalAmount": 20.0,
+    "currency": "EUR",
     "createdAt": "2026-09-20T10:00:00Z",
     "comment": "Entretien de recrutement"
   }

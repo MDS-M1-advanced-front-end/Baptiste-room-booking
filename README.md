@@ -48,6 +48,11 @@ pnpm mock          # API mock sur http://localhost:4010
 pnpm dev           # serveur de dev de l'application (dans un autre terminal)
 ```
 
+### Brancher le vrai backend
+
+Dans `apps/frontend/.env.local` (ignoré par git), `API_URL=http://localhost:8080/api` envoie
+les appels au vrai backend, sans mock. Sans `API_URL`, le front parle au mock Prism.
+
 ## Commandes
 
 Avec Docker, préfixez chaque commande par `docker compose run --rm node`.
