@@ -19,9 +19,9 @@ const TONES: Record<BadgeTone, string> = {
 };
 
 export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
-  PENDING: "En attente",
+  PENDING_PAYMENT: "En attente",
   CONFIRMED: "Confirmée",
-  REJECTED: "Refusée",
+  REFUSED: "Refusée",
   CANCELLED: "Annulée",
   COMPLETED: "Terminée",
 };
@@ -33,9 +33,9 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const STATUS_TONES: Record<ReservationStatus, BadgeTone> = {
-  PENDING: "pending",
+  PENDING_PAYMENT: "pending",
   CONFIRMED: "confirmed",
-  REJECTED: "rejected",
+  REFUSED: "rejected",
   CANCELLED: "cancelled",
   COMPLETED: "completed",
 };

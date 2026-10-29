@@ -200,9 +200,9 @@ export const ModalDialog: Story = {
 export const ReservationStatus: Story = {
   render: () => (
     <div class="flex gap-(--space-3)">
-      <StatusBadge status={"PENDING" as Reservation["status"]} />
+      <StatusBadge status={"PENDING_PAYMENT" as Reservation["status"]} />
       <StatusBadge status={"CONFIRMED" as Reservation["status"]} />
-      <StatusBadge status={"REJECTED" as Reservation["status"]} />
+      <StatusBadge status={"REFUSED" as Reservation["status"]} />
     </div>
   ),
 };

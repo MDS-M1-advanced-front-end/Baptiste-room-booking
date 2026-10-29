@@ -80,7 +80,7 @@ export const useCreateReservation = routeAction$(async (input, event) => {
       message: reservationError(response?.status),
     });
   }
-  throw event.redirect(303, "/bookings/?status=PENDING");
+  throw event.redirect(303, "/bookings/?status=PENDING_PAYMENT");
 }, zod$(reservationSchema));
 
 const BookingForm = component$<{

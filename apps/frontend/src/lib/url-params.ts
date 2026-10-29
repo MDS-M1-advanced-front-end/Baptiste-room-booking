@@ -45,11 +45,11 @@ export function parseRoomsQuery(params: URLSearchParams): RoomsQuery {
 }
 
 export const RESERVATION_STATUSES = [
-  "PENDING",
+  "PENDING_PAYMENT",
   "CONFIRMED",
   "COMPLETED",
   "CANCELLED",
-  "REJECTED",
+  "REFUSED",
 ] as const satisfies readonly ReservationStatus[];
 
 export const parseStatus = (

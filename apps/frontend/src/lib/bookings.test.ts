@@ -34,7 +34,7 @@ const future = reservation(
 );
 const later = reservation(
   "later",
-  "PENDING",
+  "PENDING_PAYMENT",
   "2026-10-20T09:00:00Z",
   "2026-10-20T12:00:00Z",
 );
@@ -52,7 +52,7 @@ const endingNow = reservation(
 );
 const rejected = reservation(
   "rejected",
-  "REJECTED",
+  "REFUSED",
   "2026-10-15T09:00:00Z",
   "2026-10-15T12:00:00Z",
 );
@@ -80,14 +80,14 @@ describe("canEdit", () => {
 
   it.each([
     ["CANCELLED" as const],
-    ["REJECTED" as const],
+    ["REFUSED" as const],
     ["COMPLETED" as const],
   ])("rejects a %s booking", (status) => {
     expect(canEdit({ ...future, status }, now)).toBe(false);
   });
 
   it("rejects a started or past pending booking", () => {
-    expect(canEdit({ ...ended, status: "PENDING" }, now)).toBe(false);
+    expect(canEdit({ ...ended, status: "PENDING_PAYMENT" }, now)).toBe(false);
     expect(canEdit(endingNow, now)).toBe(false);
   });
 });

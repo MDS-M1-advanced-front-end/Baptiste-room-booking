@@ -32,11 +32,11 @@ import { reservationError } from "~/lib/reservation-errors";
 import { RESERVATION_STATUSES, parseStatus } from "~/lib/url-params";
 
 const TAB_LABELS = {
-  PENDING: "En attente",
+  PENDING_PAYMENT: "En attente",
   CONFIRMED: "Confirmées",
   COMPLETED: "Terminées",
   CANCELLED: "Annulées",
-  REJECTED: "Refusées",
+  REFUSED: "Refusées",
 };
 
 export const useBookings = routeLoader$(async (event) => {

@@ -114,11 +114,11 @@ describe("emulateList", () => {
 
   it("scopes reservations to the client and status", () => {
     const result = emulateList(
-      new URL("http://m/reservations?status=PENDING"),
+      new URL("http://m/reservations?status=PENDING_PAYMENT"),
       reservationPage,
       "mock-token-client-1",
     ) as PaginatedReservations;
-    expect(result.items.map((r) => r.status)).toEqual(["PENDING"]);
+    expect(result.items.map((r) => r.status)).toEqual(["PENDING_PAYMENT"]);
     expect(
       result.items.every(
         (r) => r.userId === "00000000-0000-4000-8000-200000000001",

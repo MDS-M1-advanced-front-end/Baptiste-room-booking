@@ -1,7 +1,7 @@
 import type { Reservation } from "@room-booking/core";
 import { formatParis } from "./format";
 
-const ACTIVE = new Set<Reservation["status"]>(["PENDING", "CONFIRMED"]);
+const ACTIVE = new Set<Reservation["status"]>(["PENDING_PAYMENT", "CONFIRMED"]);
 
 const time = (iso: string) => Date.parse(iso);
 
@@ -25,8 +25,8 @@ export function splitByTime(reservations: Reservation[], now: Date) {
 export function splitRequests(reservations: Reservation[]) {
   const sorted = [...reservations].sort(byStart);
   return {
-    pending: sorted.filter((item) => item.status === "PENDING"),
-    handled: sorted.filter((item) => item.status !== "PENDING"),
+    pending: sorted.filter((item) => item.status === "PENDING_PAYMENT"),
+    handled: sorted.filter((item) => item.status !== "PENDING_PAYMENT"),
   };
 }
 

@@ -21,7 +21,7 @@ function event(user?: User) {
   const sharedMap = new Map<string, unknown>(user ? [[USER_KEY, user]] : []);
   return {
     sharedMap,
-    url: new URL("http://x/bookings/?status=PENDING"),
+    url: new URL("http://x/bookings/?status=PENDING_PAYMENT"),
     redirect: (status: 302, url: string) => ({ status, url }),
   } as never;
 }
@@ -36,7 +36,7 @@ const thrown = (run: () => unknown) => {
 };
 
 describe("safeRedirect", () => {
-  it.each(["/rooms/", "/bookings/?status=PENDING", "/rooms/abc/"])(
+  it.each(["/rooms/", "/bookings/?status=PENDING_PAYMENT", "/rooms/abc/"])(
     "keeps internal path %s",
     (path) => {
       expect(safeRedirect(path)).toBe(path);
@@ -64,7 +64,7 @@ describe("requireUser", () => {
   it("rejects a visitor with a redirect to login keeping the target", () => {
     expect(thrown(() => requireUser(event()))).toEqual({
       status: 302,
-      url: "/login/?redirect=%2Fbookings%2F%3Fstatus%3DPENDING",
+      url: "/login/?redirect=%2Fbookings%2F%3Fstatus%3DPENDING_PAYMENT",
     });
   });
 });
