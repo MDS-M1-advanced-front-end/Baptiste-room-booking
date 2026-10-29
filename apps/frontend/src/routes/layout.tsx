@@ -31,7 +31,7 @@ export const usePendingCount = routeLoader$(async (event) => {
   if (!isManager(currentUser(event))) return 0;
   const { data } = await listReservations({
     client: api(event),
-    query: { status: "PENDING", pageSize: 1 },
+    query: { status: "PENDING_PAYMENT", pageSize: 1 },
   });
   return data?.total ?? 0;
 });

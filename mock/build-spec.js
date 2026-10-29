@@ -56,12 +56,12 @@ setExamples('/admin/statistics', 'get', '200', { default: statistics() });
 setExamples('/users/{userId}', 'patch', '200', mapValues(usersByKey, withoutKey));
 setExamples('/rooms/{roomId}', 'patch', '200', mapValues(roomsByKey, withoutKey));
 setExamples('/reservations/{reservationId}', 'patch', '200', byKey(reservations, 'id'));
-const pending = reservations.find((reservation) => reservation.status === 'PENDING');
+const pending = reservations.find((reservation) => reservation.status === 'PENDING_PAYMENT');
 setExamples('/reservations/{reservationId}/confirm', 'post', '200', {
   default: { ...pending, status: 'CONFIRMED' },
 });
 setExamples('/reservations/{reservationId}/reject', 'post', '200', {
-  default: { ...pending, status: 'REJECTED' },
+  default: { ...pending, status: 'REFUSED' },
 });
 
 function statistics() {
