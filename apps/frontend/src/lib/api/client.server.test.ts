@@ -1,5 +1,5 @@
 import { listRooms } from "@room-booking/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { api } from "./client.server";
 
 const event = (apiUrl?: string) =>
@@ -15,5 +15,16 @@ describe("api client", () => {
     });
     expect(result.data).toBeUndefined();
     expect(result.error).toBeTruthy();
+  });
+});
+
+describe("api client outside dev", () => {
+  it("throws when API_URL is unset instead of falling back to the mock", () => {
+    vi.stubEnv("DEV", "");
+    try {
+      expect(() => api(event())).toThrow("API_URL must be set");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });
