@@ -10,7 +10,6 @@ export function startSession(event: RequestEventAction, auth: AuthResponse) {
     event.cookie,
     auth.accessToken,
     auth.expiresIn ?? DEFAULT_SESSION_SECONDS,
-    event.url.protocol === "https:",
   );
   return event.redirect(
     303,

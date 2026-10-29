@@ -36,16 +36,20 @@ const thrown = (run: () => unknown) => {
 };
 
 describe("safeRedirect", () => {
-  it.each(["/rooms/", "/bookings/?status=PENDING_PAYMENT", "/rooms/abc/"])(
-    "keeps internal path %s",
-    (path) => {
-      expect(safeRedirect(path)).toBe(path);
-    },
-  );
+  it.each([
+    "/rooms/",
+    "/bookings/?status=PENDING_PAYMENT",
+    "/rooms/abc/",
+    "/rooms?x=1#a",
+  ])("keeps internal path %s", (path) => {
+    expect(safeRedirect(path)).toBe(path);
+  });
 
   it.each([
     "//evil.com",
     "/\\evil.com",
+    "/\t/evil.com",
+    "/\n/evil.com",
     "https://evil.com",
     "javascript:alert(1)",
     "",

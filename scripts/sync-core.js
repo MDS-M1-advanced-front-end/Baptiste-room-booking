@@ -1,7 +1,7 @@
 // Vendore le dépôt core partagé : copie son contenu dans packages/core.
 // Usage : pnpm core:sync (l'URL du dépôt est dans le script "core:sync" de package.json)
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, lstatSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 
@@ -26,8 +26,8 @@ try {
   rmSync(target, { recursive: true, force: true });
   cpSync(tmp, target, {
     recursive: true,
-    dereference: true,
-    filter: (src) => !excluded.has(basename(src)),
+    dereference: false,
+    filter: (src) => !excluded.has(basename(src)) && !lstatSync(src).isSymbolicLink(),
   });
   // Trace de la version copiée, pour savoir quel commit du core est embarqué
   writeFileSync(join(target, 'CORE_VERSION'), `${repoUrl}\n${commit}\n`);

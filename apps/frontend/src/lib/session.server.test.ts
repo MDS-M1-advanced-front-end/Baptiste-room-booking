@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Cookie, CookieOptions } from "@builder.io/qwik-city";
 import {
   SESSION_COOKIE,
@@ -21,20 +21,32 @@ function fakeCookie() {
 describe("session cookie", () => {
   it("saves the token as an httpOnly lax cookie on the whole site", () => {
     const { cookie, store } = fakeCookie();
-    saveToken(cookie, "jwt", 3600, true);
+    saveToken(cookie, "jwt", 3600);
     expect(readToken(cookie)).toBe("jwt");
     expect(store.get(SESSION_COOKIE)?.options).toMatchObject({
       httpOnly: true,
       sameSite: "lax",
-      secure: true,
       path: "/",
       maxAge: 3600,
     });
   });
 
+  it("is secure outside dev even when the request is plain http", () => {
+    vi.stubEnv("DEV", "");
+    try {
+      const { cookie, store } = fakeCookie();
+      saveToken(cookie, "jwt", 3600);
+      expect(store.get(SESSION_COOKIE)?.options).toMatchObject({
+        secure: true,
+      });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("rejects a cleared session: no token", () => {
     const { cookie } = fakeCookie();
-    saveToken(cookie, "jwt", 3600, false);
+    saveToken(cookie, "jwt", 3600);
     clearToken(cookie);
     expect(readToken(cookie)).toBeUndefined();
   });
