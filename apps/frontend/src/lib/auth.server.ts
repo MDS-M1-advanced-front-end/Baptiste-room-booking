@@ -35,9 +35,9 @@ export const safeRedirect = (target: string | null | undefined) => {
   if (!target) return HOME;
   try {
     const url = new URL(target, REDIRECT_BASE);
-    return url.origin === REDIRECT_BASE
-      ? url.pathname + url.search + url.hash
-      : HOME;
+    const out = url.pathname + url.search + url.hash;
+    // "/.//evil.com" normalizes to "//evil.com": check what is returned.
+    return url.origin === REDIRECT_BASE && !out.startsWith("//") ? out : HOME;
   } catch {
     return HOME;
   }
