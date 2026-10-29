@@ -4,16 +4,12 @@ export const SESSION_COOKIE = "quorum_session";
 
 export const readToken = (cookie: Cookie) => cookie.get(SESSION_COOKIE)?.value;
 
-export const saveToken = (
-  cookie: Cookie,
-  token: string,
-  maxAge: number,
-  secure: boolean,
-) =>
+// Secure off only in dev: plain-http localhost must still get the cookie.
+export const saveToken = (cookie: Cookie, token: string, maxAge: number) =>
   cookie.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure,
+    secure: !import.meta.env.DEV,
     path: "/",
     maxAge,
   });

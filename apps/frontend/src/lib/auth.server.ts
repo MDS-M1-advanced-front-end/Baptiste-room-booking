@@ -28,5 +28,17 @@ export function requireRole(event: GuardEvent, roles: UserRole[]): User {
   return user;
 }
 
-export const safeRedirect = (target: string | null | undefined) =>
-  target && /^\/(?![/\\])/.test(target) ? target : HOME;
+// URL parsing, not a regex: browsers strip tabs/newlines and treat "\" as "/".
+const REDIRECT_BASE = "http://internal.invalid";
+
+export const safeRedirect = (target: string | null | undefined) => {
+  if (!target) return HOME;
+  try {
+    const url = new URL(target, REDIRECT_BASE);
+    return url.origin === REDIRECT_BASE
+      ? url.pathname + url.search + url.hash
+      : HOME;
+  } catch {
+    return HOME;
+  }
+};

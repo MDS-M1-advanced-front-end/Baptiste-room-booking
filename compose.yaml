@@ -35,10 +35,10 @@ services:
     command: [pnpm, mock]
     # Les ports du serveur de dev sont publiés ici, car `dev` partage le réseau de `mock`
     ports:
-      - '4010:4010' # mock Prism
-      - '3000:3000' # Next.js, Nuxt
-      - '4200:4200' # Angular
-      - '5173:5173' # Vite (Vue, Svelte, SolidStart…)
+      - '127.0.0.1:4010:4010' # mock Prism
+      - '127.0.0.1:3000:3000' # Next.js, Nuxt
+      - '127.0.0.1:4200:4200' # Angular
+      - '127.0.0.1:5173:5173' # Vite (Vue, Svelte, SolidStart…)
     # Prêt quand Prism écoute (donc après le pnpm install)
     healthcheck:
       test: nc -z 127.0.0.1 4010

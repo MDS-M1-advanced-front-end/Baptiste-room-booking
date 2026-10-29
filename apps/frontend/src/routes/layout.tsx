@@ -15,7 +15,20 @@ import { HOME, USER_KEY, currentUser } from "~/lib/auth.server";
 import { isManager } from "~/lib/navigation";
 import { clearToken, readToken } from "~/lib/session.server";
 
+// Minimal CSP: Qwik inlines its loader script, so no script-src here.
+const CSP =
+  "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'";
+
 export const onRequest: RequestHandler = async (event) => {
+  event.headers.set("Content-Security-Policy", CSP);
+  event.headers.set("X-Frame-Options", "DENY");
+  event.headers.set("X-Content-Type-Options", "nosniff");
+  event.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (!import.meta.env.DEV)
+    event.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains",
+    );
   event.cacheControl({ noCache: true, private: true });
   if (!readToken(event.cookie)) return;
   const { data } = await getCurrentUser({ client: api(event) });
